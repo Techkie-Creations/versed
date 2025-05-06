@@ -3,7 +3,9 @@ import { RouterLink } from "vue-router";
 </script>
 
 <template>
-  <header class="w-full px-8 py-4 flex justify-between items-center border-b">
+  <header
+    class="w-full px-8 py-4 flex justify-between items-center border-b fixed top-0 left-0 bg-eerie"
+  >
     <img src="@/assets/logo.svg" alt="logo" class="w-[6rem]" />
     <nav class="w-1/3">
       <ul class="flex justify-between items-center">
