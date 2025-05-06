@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Landing from "../views/Landing.vue";
+import Login from "@/views/Login.vue";
 import NotFound from "@/views/NotFound.vue";
 
 const router = createRouter({
@@ -9,6 +10,11 @@ const router = createRouter({
       path: "/",
       name: "landing",
       component: Landing,
+    },
+    {
+      path: "/auth/login",
+      name: "login",
+      component: Login,
     },
     {
       path: "/:catchAll(.*)",

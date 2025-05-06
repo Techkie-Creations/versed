@@ -28,7 +28,7 @@ import { RouterLink } from "vue-router";
             >Contact Us</RouterLink
           >
         </li>
-        <RouterLink to="/"
+        <RouterLink to="/auth/login"
           ><i
             class="pi pi-user border-2 p-2 rounded text-2xl hover:cursor-pointer hover:bg-alice hover:text-eerie"
           >
