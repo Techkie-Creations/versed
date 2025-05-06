@@ -1,8 +1,8 @@
 <script setup></script>
 
 <template>
-  <h1 class="font-caveat text-center text-8xl mt-25">Login</h1>
-  <div class="w-[50vw] mx-auto mt-16">
+  <h1 class="font-caveat text-center text-8xl mt-25">SignUp</h1>
+  <form class="w-[50vw] mx-auto mt-16">
     <div class="flex justify-between mb-4 gap-2">
       <div class="first w-1/2">
         <label for="first name" class="block mb-2">First Name:</label>
@@ -70,5 +70,6 @@
         SVG, PNG, JPG or GIF (MAX. 800x400px).
       </p>
     </div>
-  </div>
+    <button type="submit">SignUp</button>
+  </form>
 </template>
