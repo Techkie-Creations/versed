@@ -1,0 +1,24 @@
+import axios from "axios";
+import { CookieJar } from 'tough-cookie'
+import { wrapper } from 'axios-cookiejar-support'
+
+const jar = new CookieJar()
+
+export const api = wrapper(
+    axios.create({ jar: jar, baseURL: 'http://localhost:5000/api'})
+)
+
+export const registerUser = async (form: FormData) => {
+    console.log(form)
+    const results = await api.post('/auth/register', form, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+        withCredentials: true
+    }).then(response => {
+        return response.data
+    }).catch(err => {
+        return err.response.data
+    })
+    return results
+}
