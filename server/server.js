@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import authRouter from './api/auth.js'
+import { connectDB } from './config/dbconfig.js'
 
 dotenv.config()
 const app = express()
@@ -18,11 +19,13 @@ const corsOptions = {
 }
 
 app.use(cors(corsOptions))
+app.use(bodyParser.json({limit: '100mb'}))
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(cookieParser())
 
 app.use('/api/auth', authRouter)
 
 app.listen(PORT, () => {
+    connectDB()
     console.log(`Server started on http://localhost:${PORT}`)
 })

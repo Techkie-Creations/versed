@@ -5,19 +5,19 @@ import { imageObject, allBooks } from "@/utils/Types";
 import { fileObject, defaultAvatar } from "@/utils/FileObject";
 import { onMounted, ref } from "vue";
 import { registerUser } from "@/api/api";
+import { VueSpinnerBars } from "vue3-spinners";
 
 const file = ref(defaultAvatar);
 
-const { handleSubmit, errors } = useForm({
+const { handleSubmit, errors,  isSubmitting } = useForm({
   validationSchema
 });
 
-const { value: firstName } = useField("fname");
-const { value: lastName } = useField("lname");
+const { value: firstName } = useField("firstName");
+const { value: lastName } = useField("lastName");
 const { value: email } = useField("email");
-const { value: username } = useField("username");
-const { value: password } = useField("pwd");
-const { value: confirmPassword } = useField("cfmpwd");
+const { value: password } = useField("password");
+const { value: confirmPassword } = useField("confirmPassword");
 const { setValue: setVersion, value: version } = useField("version");
 const { setValue: setBook, value: book } = useField("book");
 const { setValue: setChapter, value: chapter } = useField("chapter");
@@ -81,13 +81,12 @@ const onSubmit = handleSubmit(async (data) => {
   formData.append('firstName', data.firstName)
   formData.append('lastName', data.lastName)
   formData.append('email', data.email)
-  formData.append('username', data.username)
   formData.append('password', data.password)
   formData.append('version', data.version)
   formData.append('book', data.book)
   formData.append('chapter', data.chapter)
   formData.append('verse', data.verse)
-  formData.append('defaultAvatar', file ? 'false' : 'true')
+  formData.append('defaultAvatar', file.value !== defaultAvatar ? 'false' : 'true')
 
   const results = await registerUser(formData)
   console.log(results)
@@ -100,29 +99,30 @@ const onSubmit = handleSubmit(async (data) => {
   <form @submit.prevent="onSubmit" class="w-[50vw] mx-auto mt-16">
     <div class="flex justify-between mb-4 gap-2">
       <div class="first w-1/2">
-        <label for="first name" class="block mb-2">First Name * :</label>
+        <label for="first name" class="block mb-2"><i class="pi pi-user text-baseRed mr-4"></i> First Name <span class="text-baseRed">*</span> :</label>
         <input
           v-model="firstName"
           class="border rounded p-2 w-full"
           type="text"
-          name="fname"
+          name="firstName"
           placeholder="John"
         />
-        <span class="text-baseRed">{{ errors.firstName }}</span>
+        <span class="text-baseRed mt-2 block text-sm">{{ errors.firstName }}</span>
       </div>
       <div class="second w-1/2">
-        <label for="lst name" class="block mb-2">Last Name <span class="text-baseRed">*</span> :</label>
+        <label for="lst name" class="block mb-2"><i class="pi pi-user text-baseRed mr-4"></i> Last Name <span class="text-baseRed">*</span> :</label>
         <input
           v-model="lastName"
           class="border rounded p-2 w-full"
           type="text"
-          name="lname"
+          name="lastName"
           placeholder="Doe"
         />
+        <span class="text-baseRed mt-2 block text-sm">{{ errors.lastName }}</span>
       </div>
     </div>
     <div class="mb-4 w-full">
-      <label for="email" class="block mb-2">Email * :</label>
+      <label for="email" class="block mb-2"><i class="pi pi-envelope text-baseRed mr-4"></i> Email <span class="text-baseRed">*</span> :</label>
       <input
         v-model="email"
         type="email"
@@ -130,47 +130,48 @@ const onSubmit = handleSubmit(async (data) => {
         class="border rounded p-2 w-full"
         placeholder="john@doe.com"
       />
+        <span class="text-baseRed mt-2 block text-sm">{{ errors.email }}</span>
     </div>
     <div class="mb-4 w-full">
-      <label for="username" class="block mb-2">Username :</label>
-      <input
-        v-model="username"
-        type="text"
-        name="username"
-        class="border rounded p-2 w-full"
-        placeholder="MrDoe"
-      />
-    </div>
-    <div class="mb-4 w-full">
-      <label for="password" class="block mb-2">Password * :</label>
+      <label for="password" class="block mb-2"><i class="pi pi-lock text-baseRed mr-4"></i> Password <span class="text-baseRed">*</span> :</label>
       <input
         v-model="password"
         type="password"
-        name="pwd"
+        name="password"
         class="border rounded p-2 w-full"
         placeholder="**********"
       />
+        <span class="text-baseRed mt-2 block text-sm">{{ errors.password }}</span>
     </div>
     <div class="mb-4 w-full">
       <label for="confirm password" class="block mb-2"
-        >Confirm Password * :</label
+        ><i class="pi pi-lock text-baseRed mr-4"></i> Confirm Password <span class="text-baseRed">*</span> :</label
       >
       <input
         v-model="confirmPassword"
         type="password"
-        name="cfmpwd"
+        name="confirmPassword"
         class="border rounded p-2 w-full"
         placeholder="**********"
       />
+        <span class="text-baseRed mt-2 block text-sm">{{ errors.confirmPassword }}</span>
     </div>
     <div class="mb-4 w-full">
       <div class="w-full flex justify-between items-center">
         <label for="bible verse" class="block mb-2"
-          >Favorite Bible Verse * :</label
+          ><i class="pi pi-book text-baseRed mr-4"></i> Favorite Bible Verse <span class="text-baseRed">*</span> :</label
         >
-        <i
-          class="pi pi-question text-1xl p-1 border hover:cursor-pointer rounded-full hover:bg-alice hover:text-eerie"
-        ></i>
+        <div class="relative group">
+            <i class="pi pi-question text-1xl p-1 border hover:cursor-pointer rounded-full hover:bg-alice hover:text-eerie"></i>
+            <div
+                class="absolute bottom-full left-1/2 
+                       transform -translate-x-1/2 mb-2 
+                       w-max px-2 py-1 text-sm text-white
+                       bg-baseRed rounded shadow-lg 
+                       opacity-0 group-hover:opacity-100">
+                       Will Be Used To Reset Your Password
+            </div>
+        </div>
       </div>
       <div class="flex justify-between items-center gap-2">
         <select
@@ -201,22 +202,24 @@ const onSubmit = handleSubmit(async (data) => {
           id="chapter"
           class="rounded p-2 border w-1/3 bg-eerie"
         >
-          <option value="Chapter">Chapter</option>
+          <option value="Chapter" disabled hidden>Chapter</option>
           <option value="1">1</option>
         </select>
-        <select
+        
+          <select
           v-model="verse"
           name="verse"
           id="verse"
           class="rounded p-2 border w-1/3 bg-eerie"
         >
-          <option value="Verse">Verse</option>
+          <option value="Verse" disabled hidden>Verse</option>
           <option value="1">1</option>
         </select>
       </div>
+      <span class="text-baseRed block mt-2 text-sm" v-if="errors.book || errors.chapter || errors.verse">The following is required: {{ errors.book && 'Book' }} - {{ errors.chapter && 'Chapter' }} - {{ errors.verse && 'Verse' }}</span>
     </div>
     <div class="mb-6 w-full">
-      <label class="block mb-2 dark:text-white" for="avatar">Upload file</label>
+      <label class="block mb-2 dark:text-white" for="avatar"><i class="pi pi-user text-baseRed mr-4"></i> Upload file</label>
       <div class="flex justify-between items-center gap-2">
         <img
           :src="file"
@@ -235,14 +238,18 @@ const onSubmit = handleSubmit(async (data) => {
         />
       </div>
       <p class="mt-1 dark:text-gray-300" id="file_input_help">
-        SVG, PNG, JPG or GIF (MAX. 800x400px).
+        SVG, PNG, JPG (MAX. 800x400px).
       </p>
     </div>
     <button
+    :disabled="isSubmitting"
       type="submit"
-      class="w-full mb-4 rounded p-2 cursor-pointer border bg-alice text-eerie hover:bg-eerie hover:text-alice"
+      class="w-full mb-4 rounded p-2 cursor-pointer border flex place-content-center bg-alice text-eerie hover:bg-eerie hover:text-alice"
     >
-      Sign Up
+      <span v-if="isSubmitting" class="flex gap-4 items-center justify-center">Submitting...<VueSpinnerBars size="30" class="text-baseRed" /></span>
+      <span v-else><i class="pi pi-user-plus text-baseRed mr-4"></i>Sign Up</span>
     </button>
   </form>
+  <hr class="bg-alice mt-4 w-2/4 m-auto" />
+  <p class="text-center my-4">Already Have An Account? <RouterLink to="/auth/login" class="text-baseRed hover:text-alice hover:underline">Log In</RouterLink></p>
 </template>

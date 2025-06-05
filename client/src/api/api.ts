@@ -22,3 +22,10 @@ export const registerUser = async (form: FormData) => {
     })
     return results
 }
+
+export const loginUser = async (form: {email: string; password: string}) =>  {
+    const results = await api.post('/auth/login', form, {
+        withCredentials: true
+    }).then(res => res.data).catch(err => err.response.data)
+    return results
+}
