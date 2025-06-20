@@ -1,3 +1,5 @@
+import { defaultAvatar } from "./FileObject";
+
 export type ImageURL = {
   fileUrl: string;
   fileName: string;
@@ -6,6 +8,19 @@ export type ImageURL = {
 
 export const imageObject: ImageURL[] = [];
 
+export const defaultFileObj: ImageURL = {
+  fileUrl: defaultAvatar,
+  fileName: "default.jpg",
+  fileType: "image/jpg",
+};
+
+export type userData = {
+  name: string;
+  avatar: string;
+  isAuth: boolean;
+};
+
+// BIBLICAL ZONE
 export const allBooks = [
   "Genesis",
   "Exodus",

@@ -1,17 +1,24 @@
 <script lang="ts" setup>
 import { useField, useForm } from "vee-validate";
-import validationSchema from "@/utils/RegisterSchema";
-import { imageObject, allBooks } from "@/utils/Types";
-import { fileObject, defaultAvatar } from "@/utils/FileObject";
+import { imageObject, defaultFileObj } from "@/utils/Types";
+import { fileObject, defaultAvatar, tooltipTheme } from "@/utils/FileObject";
 import { onMounted, ref } from "vue";
 import { registerUser } from "@/api/api";
 import { VueSpinnerBars } from "vue3-spinners";
+import { Button } from "primevue";
+import { useToast } from "vue-toastification";
+import { RegistrationSchema } from "@/utils/ValidationSchemas";
+import VerseSelector from "@/components/VerseSelector.vue";
+import PasswordConfirmation from "@/components/PasswordConfirmation.vue";
+import router from "@/router";
 
 const file = ref(defaultAvatar);
 
-const { handleSubmit, errors,  isSubmitting } = useForm({
-  validationSchema
+const { handleSubmit, errors, isSubmitting, setFieldError } = useForm({
+  validationSchema: RegistrationSchema,
 });
+
+const toast = useToast();
 
 const { value: firstName } = useField("firstName");
 const { value: lastName } = useField("lastName");
@@ -54,7 +61,8 @@ const handleFileChange = async (e) => {
       fileType: type,
     };
   } else {
-    const { fileUrl, fileName, fileType } = imageObject[0];
+    const { fileUrl, fileName, fileType } =
+      imageObject.length > 0 ? imageObject[0] : defaultFileObj;
     const file = document.getElementById("file");
 
     if (fileUrl && fileName) {
@@ -69,187 +77,202 @@ const handleFileChange = async (e) => {
   }
 };
 
-const onSubmit = handleSubmit(async (data) => {
-  const formData = new FormData()
+const handleRemoval = async () => {
+  const files = document.getElementById("file");
+  if (files instanceof HTMLInputElement) {
+    files.value = "";
+    file.value = defaultAvatar;
+    const { fileUrl, fileName, fileType } = imageObject[0];
+    URL.revokeObjectURL(fileUrl);
+    await fileObject({ fileUrl, fileName, fileType }, true);
+    imageObject.pop();
+    files.files = await fileObject(defaultFileObj, false);
+  }
+};
 
-  console.log(data)
+const onSubmit = handleSubmit(async (data, action) => {
+  const formData = new FormData();
 
-  const fileReturn = await fileObject(imageObject[0])
-  console.log('FILE RETURN', fileReturn[0])
+  if (
+    data.book === "Select Book" ||
+    data.chapter === "Chapter" ||
+    data.verse === "Verse"
+  )
+    return action.setErrors({
+      chapter: chapter.value === "Chapter" ? "Required" : "",
+      book: book.value === "Select Book" ? "Required" : "",
+      verse: verse.value === "Verse" ? "Required" : "",
+    });
 
-  formData.append('avatar', data.avatar.length === 0 ? fileReturn[0] : data.avatar[0])
-  formData.append('firstName', data.firstName)
-  formData.append('lastName', data.lastName)
-  formData.append('email', data.email)
-  formData.append('password', data.password)
-  formData.append('version', data.version)
-  formData.append('book', data.book)
-  formData.append('chapter', data.chapter)
-  formData.append('verse', data.verse)
-  formData.append('defaultAvatar', file.value !== defaultAvatar ? 'false' : 'true')
+  console.log(data);
 
-  const results = await registerUser(formData)
-  console.log(results)
-})
+  const fileReturn = await fileObject(imageObject[0]);
+  console.log("FILE RETURN", fileReturn[0]);
 
+  console.log(data.avatar[0], "NEW");
+
+  formData.append(
+    "avatar",
+    data.avatar.length !== 0 ? fileReturn[0] : data.avatar[0]
+  );
+  formData.append("firstName", data.firstName);
+  formData.append("lastName", data.lastName);
+  formData.append("email", data.email);
+  formData.append("password", data.password);
+  formData.append("version", data.version);
+  formData.append("book", data.book);
+  formData.append("chapter", data.chapter);
+  formData.append("verse", data.verse);
+  formData.append(
+    "defaultAvatar",
+    file.value !== defaultAvatar ? "false" : "true"
+  );
+
+  const results = await registerUser(formData);
+  if (!results.success) {
+    toast.error(`${results.message}`);
+    if (results.level === "email")
+      return setFieldError("email", "Email Already Exists!");
+  } else if (results.success) {
+    toast.success(`${results.message}`);
+    router.push("/");
+  }
+});
 </script>
 
 <template>
   <h1 class="font-caveat text-center text-8xl mt-25">Sign Up</h1>
   <form @submit.prevent="onSubmit" class="w-[50vw] mx-auto mt-16">
     <div class="flex justify-between mb-4 gap-2">
-      <div class="first w-1/2">
-        <label for="first name" class="block mb-2"><i class="pi pi-user text-baseRed mr-4"></i> First Name <span class="text-baseRed">*</span> :</label>
+      <div class="w-1/2">
+        <label for="firstName" class="block mb-2"
+          ><i class="pi pi-user text-baseRed mr-4"></i> First Name
+          <span class="text-baseRed">*</span> :</label
+        >
         <input
           v-model="firstName"
-          class="border rounded p-2 w-full"
+          :class="`${
+            errors.firstName
+              ? 'border-2 border-red-500 focus:outline-hidden'
+              : 'border'
+          } rounded p-2 w-full`"
           type="text"
           name="firstName"
           placeholder="John"
         />
-        <span class="text-baseRed mt-2 block text-sm">{{ errors.firstName }}</span>
+        <span class="text-red-500 mt-2 block text-sm">{{
+          errors.firstName
+        }}</span>
       </div>
       <div class="second w-1/2">
-        <label for="lst name" class="block mb-2"><i class="pi pi-user text-baseRed mr-4"></i> Last Name <span class="text-baseRed">*</span> :</label>
+        <label for="lastName" class="block mb-2"
+          ><i class="pi pi-user text-baseRed mr-4"></i> Last Name
+          <span class="text-baseRed">*</span> :</label
+        >
         <input
           v-model="lastName"
-          class="border rounded p-2 w-full"
+          :class="`${
+            errors.lastName
+              ? 'border-2 border-red-500 focus:outline-hidden'
+              : 'border'
+          } rounded p-2 w-full`"
           type="text"
           name="lastName"
           placeholder="Doe"
         />
-        <span class="text-baseRed mt-2 block text-sm">{{ errors.lastName }}</span>
+        <span class="text-red-500 mt-2 block text-sm">{{
+          errors.lastName
+        }}</span>
       </div>
     </div>
     <div class="mb-4 w-full">
-      <label for="email" class="block mb-2"><i class="pi pi-envelope text-baseRed mr-4"></i> Email <span class="text-baseRed">*</span> :</label>
+      <label for="email" class="block mb-2"
+        ><i class="pi pi-envelope text-baseRed mr-4"></i> Email
+        <span class="text-baseRed">*</span> :</label
+      >
       <input
         v-model="email"
         type="email"
         name="email"
-        class="border rounded p-2 w-full"
+        :class="`${
+          errors.email
+            ? 'border-2 border-red-500 focus:outline-hidden'
+            : 'border'
+        } rounded p-2 w-full`"
         placeholder="john@doe.com"
       />
-        <span class="text-baseRed mt-2 block text-sm">{{ errors.email }}</span>
+      <span class="text-red-500 mt-2 block text-sm">{{ errors.email }}</span>
     </div>
-    <div class="mb-4 w-full">
-      <label for="password" class="block mb-2"><i class="pi pi-lock text-baseRed mr-4"></i> Password <span class="text-baseRed">*</span> :</label>
-      <input
-        v-model="password"
-        type="password"
-        name="password"
-        class="border rounded p-2 w-full"
-        placeholder="**********"
-      />
-        <span class="text-baseRed mt-2 block text-sm">{{ errors.password }}</span>
-    </div>
-    <div class="mb-4 w-full">
-      <label for="confirm password" class="block mb-2"
-        ><i class="pi pi-lock text-baseRed mr-4"></i> Confirm Password <span class="text-baseRed">*</span> :</label
-      >
-      <input
-        v-model="confirmPassword"
-        type="password"
-        name="confirmPassword"
-        class="border rounded p-2 w-full"
-        placeholder="**********"
-      />
-        <span class="text-baseRed mt-2 block text-sm">{{ errors.confirmPassword }}</span>
-    </div>
-    <div class="mb-4 w-full">
-      <div class="w-full flex justify-between items-center">
-        <label for="bible verse" class="block mb-2"
-          ><i class="pi pi-book text-baseRed mr-4"></i> Favorite Bible Verse <span class="text-baseRed">*</span> :</label
-        >
-        <div class="relative group">
-            <i class="pi pi-question text-1xl p-1 border hover:cursor-pointer rounded-full hover:bg-alice hover:text-eerie"></i>
-            <div
-                class="absolute bottom-full left-1/2 
-                       transform -translate-x-1/2 mb-2 
-                       w-max px-2 py-1 text-sm text-white
-                       bg-baseRed rounded shadow-lg 
-                       opacity-0 group-hover:opacity-100">
-                       Will Be Used To Reset Your Password
-            </div>
-        </div>
-      </div>
-      <div class="flex justify-between items-center gap-2">
-        <select
-          v-model="version"
-          name="version"
-          id="version"
-          class="rounded p-2 border w-2/4 bg-eerie"
-        >
-          <option value="NKJV">NKJV</option>
-          <option value="AMP">AMP</option>
-        </select>
-        <select
-          v-model="book"
-          name="book"
-          id="book"
-          class="rounded p-2 border w-3/4 bg-eerie"
-        >
-          <option value="Select Book" disabled hidden>
-            Select Book
-          </option>
-          <option v-for="book in allBooks" :value="book">
-            {{ book }}
-          </option>
-        </select>
-        <select
-          v-model="chapter"
-          name="chapter"
-          id="chapter"
-          class="rounded p-2 border w-1/3 bg-eerie"
-        >
-          <option value="Chapter" disabled hidden>Chapter</option>
-          <option value="1">1</option>
-        </select>
-        
-          <select
-          v-model="verse"
-          name="verse"
-          id="verse"
-          class="rounded p-2 border w-1/3 bg-eerie"
-        >
-          <option value="Verse" disabled hidden>Verse</option>
-          <option value="1">1</option>
-        </select>
-      </div>
-      <span class="text-baseRed block mt-2 text-sm" v-if="errors.book || errors.chapter || errors.verse">The following is required: {{ errors.book && 'Book' }} - {{ errors.chapter && 'Chapter' }} - {{ errors.verse && 'Verse' }}</span>
-    </div>
+
+    <PasswordConfirmation
+      v-model:confirm-password="confirmPassword"
+      v-model:password="password"
+      v-model:errors="errors"
+    />
+
+    <VerseSelector
+      title="Favorite Verse"
+      v-model:version="version"
+      v-model:book="book"
+      v-model:chapter="chapter"
+      v-model:verse="verse"
+      v-model:errors="errors"
+      :tip="true"
+      :show-version="true"
+    />
     <div class="mb-6 w-full">
-      <label class="block mb-2 dark:text-white" for="avatar"><i class="pi pi-user text-baseRed mr-4"></i> Upload file</label>
+      <label class="block mb-2 dark:text-white" for="avatar"
+        ><i class="pi pi-user text-baseRed mr-4 mb-2"></i> Upload file</label
+      >
       <div class="flex justify-between items-center gap-2">
         <img
           :src="file"
           alt="avatar"
-          class="w-[4rem] h-[4rem] rounded-[50%] object-fill object-center"
+          class="w-[5.5em] h-[5rem] rounded-[50%] object-fill object-center"
         />
         <input
           @change="handleFileChange($event)"
           class="border rounded w-full p-2 text-alice file:mr-5 file:py-1 file:px-3 file:border-[1px] file:rounded file:bg-eerie file:text-alice hover:file:cursor-pointer hover:file:bg-alice hover:file:text-eerie transition duration-500 ease-in-out"
-          aria-describedby="file_input_help"
+          aria-describedby="image"
           name="avatar"
           type="file"
           ref="fileInput"
           accept="image/png, image/jpeg"
           id="file"
         />
+        <Button
+          v-if="file !== defaultAvatar"
+          icon="pi pi-times"
+          v-tooltip.top="{
+            value: 'Remove image',
+            ...tooltipTheme,
+          }"
+          class="border p-2 rounded hover:bg-alice hover:text-eerie"
+          @click="handleRemoval"
+        />
       </div>
-      <p class="mt-1 dark:text-gray-300" id="file_input_help">
-        SVG, PNG, JPG (MAX. 800x400px).
-      </p>
+      <p class="mt-1 dark:text-gray-300">PNG, JPG (MAX. 800x400px).</p>
     </div>
     <button
-    :disabled="isSubmitting"
+      :disabled="isSubmitting"
       type="submit"
       class="w-full mb-4 rounded p-2 cursor-pointer border flex place-content-center bg-alice text-eerie hover:bg-eerie hover:text-alice"
     >
-      <span v-if="isSubmitting" class="flex gap-4 items-center justify-center">Submitting...<VueSpinnerBars size="30" class="text-baseRed" /></span>
-      <span v-else><i class="pi pi-user-plus text-baseRed mr-4"></i>Sign Up</span>
+      <span v-if="isSubmitting" class="flex gap-4 items-center justify-center"
+        >Submitting...<VueSpinnerBars size="30" class="text-baseRed"
+      /></span>
+      <span v-else
+        ><i class="pi pi-user-plus text-baseRed mr-4"></i>Sign Up</span
+      >
     </button>
   </form>
   <hr class="bg-alice mt-4 w-2/4 m-auto" />
-  <p class="text-center my-4">Already Have An Account? <RouterLink to="/auth/login" class="text-baseRed hover:text-alice hover:underline">Log In</RouterLink></p>
+  <p class="text-center my-4">
+    Already Have An Account?
+    <RouterLink
+      to="/auth/login"
+      class="text-baseRed hover:text-alice hover:underline"
+      >Log In</RouterLink
+    >
+  </p>
 </template>

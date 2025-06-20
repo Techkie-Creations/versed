@@ -3,3 +3,4 @@ README*.txt
 *logs
 *.rest
 avatar
+.env
