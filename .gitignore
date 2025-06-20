@@ -4,3 +4,4 @@ README*.txt
 *.rest
 avatar
 .env
+.vscode
