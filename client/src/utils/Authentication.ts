@@ -1,16 +1,17 @@
 import { checkAuth } from "@/api/api";
-import type { userData } from "./Types";
 
-export const Authenticated = async (schema: "route" | "navbar") => {
+export const Authenticated = async (toRoute: string = "") => {
+  const afterAuth = [
+    "/auth/login",
+    "/",
+    "/auth/forgotPassword",
+    "/auth/signup",
+  ];
+  const beforeAuth = ["/dashboard", "/my-account"];
   const results = await checkAuth();
-  if (schema === "route") return results.success;
-  if (schema === "navbar") {
-    if (!results.success) return false;
-    const userInfo: userData = {
-      name: results.name,
-      avatar: results.avatar,
-      isAuth: results.success,
-    };
-    return userInfo;
-  }
+
+  if (results.success && afterAuth.indexOf(toRoute) >= 0) return "/dashboard";
+  else if (!results.success && beforeAuth.indexOf(toRoute) >= 0)
+    return "/auth/login";
+  else return toRoute;
 };

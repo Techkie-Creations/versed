@@ -11,6 +11,7 @@ import { RegistrationSchema } from "@/utils/ValidationSchemas";
 import VerseSelector from "@/components/VerseSelector.vue";
 import PasswordConfirmation from "@/components/PasswordConfirmation.vue";
 import router from "@/router";
+import NavBar from "@/components/NavBar.vue";
 
 const file = ref(defaultAvatar);
 
@@ -135,12 +136,16 @@ const onSubmit = handleSubmit(async (data, action) => {
       return setFieldError("email", "Email Already Exists!");
   } else if (results.success) {
     toast.success(`${results.message}`);
-    router.push("/");
+    setTimeout(() => {
+      router.push("/");
+    }, 500);
+    return;
   }
 });
 </script>
 
 <template>
+  <NavBar />
   <h1 class="font-caveat text-center text-8xl mt-25">Sign Up</h1>
   <form @submit.prevent="onSubmit" class="w-[50vw] mx-auto mt-16">
     <div class="flex justify-between mb-4 gap-2">

@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 import authRouter from "./api/auth.js";
 import { connectDB } from "./config/dbconfig.js";
 import { validateToken } from "./middleware/validateToken.js";
+import User from "./models/UserModel.js";
+import { fullName } from "./helper/misc.js";
 
 dotenv.config();
 const app = express();
@@ -26,9 +28,29 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
 
-// app.get("/checkUser", validateToken(), (req, res) => {
-//   console.log("REACHED");
-// });
+app.get("/api/checkUser", validateToken, async (req, res) => {
+  try {
+    const userDetails = await User.findById(
+      req.info.userId,
+      "firstName lastName avatar"
+    );
+    return res
+      .cookie("accessToken", req.info.token, {
+        expires: new Date(Date.now() + 3 * 60 * 1000),
+        httpOnly: true,
+        domain: "localhost",
+        path: "/",
+      })
+      .status(200)
+      .json({
+        success: true,
+        name: fullName(userDetails.firstName, userDetails.lastName),
+        avatar: userDetails.avatar,
+      });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Server Error..." });
+  }
+});
 
 app.listen(PORT, () => {
   connectDB();

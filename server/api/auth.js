@@ -88,13 +88,13 @@ router.post("/register", upload.single("avatar"), async (req, res) => {
 
     res
       .cookie("refreshToken", refreshToken, {
-        expires: new Date(Date.now() + 1 * 60 * 1000),
+        expires: new Date(Date.now() + 3 * 60 * 1000),
         httpOnly: true,
         domain: "localhost",
         path: "/",
       })
       .cookie("accessToken", generateAccessToken(newUser._id), {
-        expires: new Date(Date.now() + 15 * 1000),
+        expires: new Date(Date.now() + 2 * 60 * 1000),
         httpOnly: true,
         domain: "localhost",
         path: "/",
@@ -130,13 +130,13 @@ router.post("/login", async (req, res) => {
   if (matching)
     return res
       .cookie("refreshToken", generateRefreshToken(existingUser._id), {
-        expires: new Date(Date.now() + 15 * 1000),
+        expires: new Date(Date.now() + 3 * 60 * 1000),
         httpOnly: true,
         domain: "localhost",
         path: "/",
       })
       .cookie("accessToken", generateAccessToken(existingUser._id), {
-        expires: new Date(Date.now() + 15 * 1000),
+        expires: new Date(Date.now() + 3 * 60 * 1000),
         httpOnly: true,
         domain: "localhost",
         path: "/",
@@ -144,7 +144,7 @@ router.post("/login", async (req, res) => {
       .json({
         success: true,
         message: "Login Successful!",
-        avatarUrl: existingUser.avatar,
+        avatar: existingUser.avatar,
         name: fullName(existingUser.firstName, existingUser.lastName),
       });
   else
@@ -222,6 +222,20 @@ router.post("/forgotPassword", async (req, res) => {
   }
 });
 
-// 07091409190519_1271
+router.post("/logout", (_, res) => {
+  return res
+    .clearCookie("accessToken", {
+      path: "/",
+      domain: "localhost",
+      httpOnly: true,
+    })
+    .clearCookie("refreshToken", {
+      path: "/",
+      domain: "localhost",
+      httpOnly: true,
+    })
+    .status(200)
+    .json({ success: true, message: "Logged Out Successfully!" });
+});
 
 export default router;

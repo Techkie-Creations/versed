@@ -8,6 +8,16 @@ export const api = wrapper(
   axios.create({ jar: jar, baseURL: "http://localhost:5000/api" })
 );
 
+export const checkAuth = async () => {
+  const results = await api
+    .get("/checkUser", {
+      withCredentials: true,
+    })
+    .then((res) => res.data)
+    .catch((err) => err.response);
+  return results;
+};
+
 export const registerUser = async (form: FormData) => {
   console.log(form);
   const results = await api
@@ -46,12 +56,12 @@ export const forgotPassword = async (formData) => {
   return results;
 };
 
-export const checkAuth = async () => {
+export const logout = async () => {
   const results = await api
-    .get("/checkAuth", {
+    .post("/auth/logout", null, {
       withCredentials: true,
     })
     .then((res) => res.data)
-    .catch((err) => err.response);
+    .catch((err) => err.response.data);
   return results;
 };

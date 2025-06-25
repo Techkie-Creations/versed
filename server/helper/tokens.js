@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
  */
 export const generateAccessToken = (userId) => {
   const accessToken = jwt.sign({ id: userId }, process.env.JWT_ACCESS_SECRET, {
-    expiresIn: "30s",
+    expiresIn: "2m",
     issuer: `http://localhost:${process.env.PORT || 5000}`,
   });
   console.log(accessToken, "ACCESS TOKEN");
@@ -24,7 +24,7 @@ export const generateRefreshToken = (userId) => {
     { id: userId },
     process.env.JWT_REFRESH_SECRET,
     {
-      expiresIn: "1m",
+      expiresIn: "3m",
       issuer: `http://localhost:${process.env.PORT || 5000}`,
     }
   );

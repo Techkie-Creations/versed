@@ -8,6 +8,7 @@ import { ref } from "vue";
 import { LoginSchema } from "@/utils/ValidationSchemas";
 import { useToast } from "vue-toastification";
 import router from "@/router";
+import NavBar from "@/components/NavBar.vue";
 
 const { handleSubmit, errors, isSubmitting, resetField } = useForm({
   validationSchema: LoginSchema,
@@ -26,17 +27,21 @@ const onSubmit = handleSubmit(async (data) => {
   const results = await loginUser(formData);
   if (results.success) {
     toast.success(`${results.message}`);
-    router.push("/");
-    // Kryptonium@7
+    setTimeout(() => {
+      router.replace("/");
+    }, 500);
+    return;
   }
   if (!results.success) {
     toast.error(`${results.message}`);
     resetField("password");
+    return;
   }
 });
 </script>
 
 <template>
+  <NavBar />
   <h1 class="font-caveat text-center text-8xl mt-25">Log In</h1>
   <form @submit.prevent="onSubmit" class="w-[50vw] mx-auto mt-16">
     <div class="mb-4 w-full">

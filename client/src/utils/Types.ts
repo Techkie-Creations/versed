@@ -14,12 +14,6 @@ export const defaultFileObj: ImageURL = {
   fileType: "image/jpg",
 };
 
-export type userData = {
-  name: string;
-  avatar: string;
-  isAuth: boolean;
-};
-
 // BIBLICAL ZONE
 export const allBooks = [
   "Genesis",

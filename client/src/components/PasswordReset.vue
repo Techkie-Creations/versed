@@ -61,7 +61,9 @@ const handlePasswordReset = handleSubmit(async (data) => {
   if (results.success) {
     correctCode.value = true;
     toast.success(results.message);
-    router.push("/auth/login");
+    setTimeout(() => {
+      router.push("/auth/login");
+    }, 500);
     return;
   }
   toast.error(results.message);

@@ -8,6 +8,7 @@ import { ForgotPasswordSchema } from "@/utils/ValidationSchemas";
 import { forgotPassword } from "@/api/api";
 import { useToast } from "vue-toastification";
 import PasswordReset from "@/components/PasswordReset.vue";
+import NavBar from "@/components/NavBar.vue";
 
 const { handleSubmit, errors, isSubmitting } = useForm({
   validationSchema: ForgotPasswordSchema,
@@ -63,6 +64,7 @@ const onSubmit = handleSubmit(async (data, action) => {
 </script>
 
 <template>
+  <NavBar />
   <h1 class="font-caveat text-center text-8xl mt-25">Forgot Password</h1>
   <RouterLink
     to="/auth/login"

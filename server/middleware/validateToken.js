@@ -13,7 +13,9 @@ export const validateToken = (req, res, next) => {
     if (err) {
       newToken = updateAccessToken(decoded.id, refreshToken);
       if (!newToken)
-        return res.status(401).json({ message: "Unauthorized Access!" });
+        return res
+          .status(401)
+          .json({ success: false, message: "Unauthorized Access!" });
     } else return newToken;
   });
   req.info = {
