@@ -76,7 +76,7 @@ const handleLogout = async () => {
 
 <template>
   <header
-    class="w-full px-8 py-4 flex justify-between items-center fixed border-b top-0 left-0 bg-eerie"
+    class="w-full px-8 py-4 flex justify-between items-center fixed border-b top-0 left-0 bg-eerie z-10"
   >
     <img
       src="@/assets/logo.svg"

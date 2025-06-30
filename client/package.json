@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@loltech/vue3-2fa-code-input": "^1.1.0",
     "@popperjs/core": "^2.11.8",
     "@primevue/themes": "^4.3.5",
     "@tailwindcss/vite": "^4.1.5",

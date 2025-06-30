@@ -5,6 +5,7 @@ import NotFound from "@/views/NotFound.vue";
 import Login from "../views/Login.vue";
 import ForgotPassword from "@/views/ForgotPassword.vue";
 import { Authenticated } from "@/utils/Authentication";
+import UserAccount from "@/views/UserAccount.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +31,11 @@ const router = createRouter({
       component: ForgotPassword,
     },
     {
+      path: "/my-accounts",
+      name: "account",
+      component: UserAccount,
+    },
+    {
       path: "/:catchAll(.*)",
       name: "notfound",
       component: NotFound,
@@ -38,7 +44,6 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, _) => {
-  console.log(to);
   const whereTo = await Authenticated(to.path);
   if (whereTo === to.path) return;
   else return whereTo;

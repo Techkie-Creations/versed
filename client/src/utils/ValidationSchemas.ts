@@ -81,3 +81,13 @@ export const passwordResetSchema = toTypedSchema(
       path: ["confirmPassword"],
     })
 );
+
+export const changeInfo = toTypedSchema(
+  z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string().email(),
+    dob: z.date(),
+    country: z.string(),
+  })
+);

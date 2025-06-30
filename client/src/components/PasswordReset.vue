@@ -4,17 +4,24 @@ import { passwordResetSchema } from "@/utils/ValidationSchemas";
 import { useField, useForm } from "vee-validate";
 import { ref } from "vue";
 import { useToast } from "vue-toastification";
-import OTP from "./OTP.vue";
+// import OTP from "./OTP.vue";
 import PasswordConfirmation from "./PasswordConfirmation.vue";
 import { VueSpinnerBars } from "vue3-spinners";
 import router from "@/router";
+import Vue2FACodeInput from "@loltech/vue3-2fa-code-input";
 
 const props = defineProps({
   email: {
     type: String,
     default: "",
   },
+  schema: {
+    type: String,
+    default: "forgot",
+  },
 });
+
+const code = ref("");
 
 const correctCode = ref(false);
 const isLoading = ref(false);
@@ -51,23 +58,27 @@ const handleCode = async (code: string, resend: boolean = false) => {
 };
 
 const handlePasswordReset = handleSubmit(async (data) => {
-  const formData = {
-    section: "pwdReset",
-    password: data.password,
-    confirmPassword: data.confirmPassword,
-    email: userEmail.value,
-  };
-  const results = await forgotPassword(formData);
-  if (results.success) {
-    correctCode.value = true;
-    toast.success(results.message);
-    setTimeout(() => {
-      router.push("/auth/login");
-    }, 500);
+  if (props.schema === "forgot") {
+    const formData = {
+      section: "pwdReset",
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+      email: userEmail.value,
+    };
+    const results = await forgotPassword(formData);
+    if (results.success) {
+      correctCode.value = true;
+      toast.success(results.message);
+      setTimeout(() => {
+        router.push("/auth/login");
+      }, 500);
+      return;
+    }
+    toast.error(results.message);
     return;
   }
-  toast.error(results.message);
-  return;
+  if (props.schema === "change") {
+  }
 });
 </script>
 
@@ -77,15 +88,25 @@ const handlePasswordReset = handleSubmit(async (data) => {
       correctCode ? "Reset Password" : "Enter Code"
     }}</label>
     <div v-if="!correctCode" class="text-center">
-      <OTP
+      <!-- <OTP
         :length="5"
         @entered="(v) => handleCode(v)"
         :isdisabled="isLoading"
+      /> -->
+      <Vue2FACodeInput
+        v-if="!isLoading"
+        v-model="code"
+        @update:model-value="handleCode(code)"
+        class="**:border-2 **:rounded-md flex **:w-1/10 justify-center **:h-10 **:text-center gap-2 my-4"
+        inputmode="numeric"
       />
-      <div v-if="isLoading" class="flex gap-4 items-center justify-center">
+      <div
+        v-if="isLoading"
+        class="flex gap-4 items-center justify-center text-4xl"
+      >
         Checking...<VueSpinnerBars size="30" class="text-baseRed" />
       </div>
-      <p class="text-center">
+      <p class="text-center" v-if="!isLoading">
         Didn't Receive Code?
         <span
           class="text-baseRed hover:text-alice hover:underline hover:cursor-pointer"

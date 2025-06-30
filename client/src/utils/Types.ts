@@ -14,6 +14,11 @@ export const defaultFileObj: ImageURL = {
   fileType: "image/jpg",
 };
 
+export const solidButton =
+  "border-2 rounded hover:bg-eerie hover:text-alice bg-alice text-eerie cursor-pointer p-2 w-full";
+export const hollowButton =
+  "border-2 rounded hover:bg-alice hover:text-eerie bg-eerie text-alice cursor-pointer p-2 w-full";
+
 // BIBLICAL ZONE
 export const allBooks = [
   "Genesis",

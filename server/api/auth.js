@@ -130,13 +130,13 @@ router.post("/login", async (req, res) => {
   if (matching)
     return res
       .cookie("refreshToken", generateRefreshToken(existingUser._id), {
-        expires: new Date(Date.now() + 3 * 60 * 1000),
+        expires: new Date(Date.now() + 3 * 60 * 60 * 1000),
         httpOnly: true,
         domain: "localhost",
         path: "/",
       })
       .cookie("accessToken", generateAccessToken(existingUser._id), {
-        expires: new Date(Date.now() + 3 * 60 * 1000),
+        expires: new Date(Date.now() + 3 * 60 * 60 * 1000),
         httpOnly: true,
         domain: "localhost",
         path: "/",
@@ -209,7 +209,6 @@ router.post("/forgotPassword", async (req, res) => {
         { new: true }
       );
       delete resetCode[`${email}`];
-      console.log(resetCode);
       return res
         .status(200)
         .json({ success: true, message: "Password Reset Successfull!" });
@@ -219,6 +218,26 @@ router.post("/forgotPassword", async (req, res) => {
         .status(200)
         .json({ success: false, message: "Server Error... Try Again Later!" });
     }
+  }
+});
+
+router.post("/changePassword", async (req, res) => {
+  const { password, email } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.findOneAndUpdate(
+      { email: email },
+      { password: hashedPassword },
+      { new: true }
+    );
+    return res
+      .status(200)
+      .json({ success: true, message: "Password Reset Successfull!" });
+  } catch (error) {
+    return res
+      .status(200)
+      .json({ success: false, message: "Server Error... Try Again Later!" });
   }
 });
 

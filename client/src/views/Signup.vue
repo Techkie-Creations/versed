@@ -1,17 +1,17 @@
 <script lang="ts" setup>
 import { useField, useForm } from "vee-validate";
-import { imageObject, defaultFileObj } from "@/utils/Types";
-import { fileObject, defaultAvatar, tooltipTheme } from "@/utils/FileObject";
+import { imageObject } from "@/utils/Types";
+import { fileObject, defaultAvatar } from "@/utils/FileObject";
 import { onMounted, ref } from "vue";
 import { registerUser } from "@/api/api";
 import { VueSpinnerBars } from "vue3-spinners";
-import { Button } from "primevue";
 import { useToast } from "vue-toastification";
 import { RegistrationSchema } from "@/utils/ValidationSchemas";
 import VerseSelector from "@/components/VerseSelector.vue";
 import PasswordConfirmation from "@/components/PasswordConfirmation.vue";
 import router from "@/router";
 import NavBar from "@/components/NavBar.vue";
+import Avatar from "@/components/Avatar.vue";
 
 const file = ref(defaultAvatar);
 
@@ -46,50 +46,6 @@ onMounted(() => {
   };
   setFile();
 });
-
-const handleFileChange = async (e) => {
-  if (e.target.files?.length !== 0) {
-    const image = e.target.files ? e.target.files[0] : new Blob();
-    const imageUrl = URL.createObjectURL(image);
-    file.value = imageUrl;
-
-    const { name, type } =
-      image instanceof File ? image : { name: "", type: "" };
-
-    imageObject[0] = {
-      fileUrl: imageUrl,
-      fileName: name,
-      fileType: type,
-    };
-  } else {
-    const { fileUrl, fileName, fileType } =
-      imageObject.length > 0 ? imageObject[0] : defaultFileObj;
-    const file = document.getElementById("file");
-
-    if (fileUrl && fileName) {
-      if (file instanceof HTMLInputElement) {
-        file.files = await fileObject({ fileUrl, fileName, fileType }, false);
-        console.log(
-          "OBJ",
-          await fileObject({ fileUrl, fileName, fileType }, false)
-        );
-      }
-    }
-  }
-};
-
-const handleRemoval = async () => {
-  const files = document.getElementById("file");
-  if (files instanceof HTMLInputElement) {
-    files.value = "";
-    file.value = defaultAvatar;
-    const { fileUrl, fileName, fileType } = imageObject[0];
-    URL.revokeObjectURL(fileUrl);
-    await fileObject({ fileUrl, fileName, fileType }, true);
-    imageObject.pop();
-    files.files = await fileObject(defaultFileObj, false);
-  }
-};
 
 const onSubmit = handleSubmit(async (data, action) => {
   const formData = new FormData();
@@ -225,39 +181,7 @@ const onSubmit = handleSubmit(async (data, action) => {
       :tip="true"
       :show-version="true"
     />
-    <div class="mb-6 w-full">
-      <label class="block mb-2 dark:text-white" for="avatar"
-        ><i class="pi pi-user text-baseRed mr-4 mb-2"></i> Upload file</label
-      >
-      <div class="flex justify-between items-center gap-2">
-        <img
-          :src="file"
-          alt="avatar"
-          class="w-[5.5em] h-[5rem] rounded-[50%] object-fill object-center"
-        />
-        <input
-          @change="handleFileChange($event)"
-          class="border rounded w-full p-2 text-alice file:mr-5 file:py-1 file:px-3 file:border-[1px] file:rounded file:bg-eerie file:text-alice hover:file:cursor-pointer hover:file:bg-alice hover:file:text-eerie transition duration-500 ease-in-out"
-          aria-describedby="image"
-          name="avatar"
-          type="file"
-          ref="fileInput"
-          accept="image/png, image/jpeg"
-          id="file"
-        />
-        <Button
-          v-if="file !== defaultAvatar"
-          icon="pi pi-times"
-          v-tooltip.top="{
-            value: 'Remove image',
-            ...tooltipTheme,
-          }"
-          class="border p-2 rounded hover:bg-alice hover:text-eerie"
-          @click="handleRemoval"
-        />
-      </div>
-      <p class="mt-1 dark:text-gray-300">PNG, JPG (MAX. 800x400px).</p>
-    </div>
+    <Avatar v-model:file="file" text="Upload File" />
     <button
       :disabled="isSubmitting"
       type="submit"
