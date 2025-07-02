@@ -1,15 +1,33 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import Avatar from "../Avatar.vue";
-import { defaultAvatar } from "@/utils/FileObject";
+import { defaultAvatar, fileObject } from "@/utils/FileObject";
 import { useField, useForm } from "vee-validate";
 import { DatePicker } from "primevue";
 import countries from "@/assets/countries.json";
 import { changeInfo } from "@/utils/ValidationSchemas";
 import { VueSpinnerBars } from "vue3-spinners";
+import { getUserProfile, updateUserProfile } from "@/api/api";
+import { imageObject, solidButton } from "@/utils/Types";
+import { useToast } from "vue-toastification";
 
 const file = ref(defaultAvatar);
-const bio = ref("");
+const bio = ref({
+  bio: "",
+  defaultBio: "",
+  bioError: "",
+});
+
+const defaultData = ref({
+  firstName: "",
+  lastName: "",
+  email: "",
+  avatar: "",
+  country: "",
+  dob: "",
+});
+
+const toast = useToast();
 
 const maxDate = ref(new Date());
 maxDate.value.setFullYear(new Date().getFullYear() - 10);
@@ -18,19 +36,89 @@ const { handleSubmit, errors, isSubmitting } = useForm({
   validationSchema: changeInfo,
 });
 
-const { value: firstName } = useField("firstName");
-const { value: lastName } = useField("lastName");
-const { value: email } = useField("email");
-const { value: dob } = useField<Date>("dob");
+const { setValue: setFirstName, value: firstName } = useField("firstName");
+const { setValue: setLastName, value: lastName } = useField("lastName");
+const { setValue: setEmail, value: email } = useField("email");
+const { setValue: setDob, value: dob } = useField<Date>("dob");
 const { setValue: setCountry, value: country } = useField("country");
 
-onMounted(() => {
-  setCountry("Select Country");
+onMounted(async () => {
+  const results = await getUserProfile();
+  if (results.success) {
+    bio.value.bio = results.profile.bio || "";
+    bio.value.defaultBio = results.profile.bio;
+    setFirstName(results.profile.firstName);
+    setLastName(results.profile.lastName);
+    setEmail(results.profile.email);
+    setCountry(results.profile.country || "Select Country");
+    file.value = results.profile.avatar;
+    if (results.profile.dob) setDob(new Date(results.profile.dob));
+    defaultData.value = {
+      firstName: results.profile.firstName,
+      lastName: results.profile.lastName,
+      dob: results.profile.dob,
+      email: results.profile.email,
+      country: results.profile.country,
+      avatar: results.profile.avatar,
+    };
+  }
 });
 
-const onSubmit = handleSubmit((data) => {
-  console.log(data);
+const bioChange = () => {
+  if (bio.value.bio.length < 10) {
+    bio.value.bioError = "Bio must be at least 10 characters";
+  } else bio.value.bioError = "";
+};
+
+const bioSubmit = async () => {
+  if (bio.value.bio === bio.value.defaultBio) return;
+  if (bio.value.bioError) return;
+  const formData = { schema: "bio", bio: bio.value.bio };
+  const results = await updateUserProfile(formData, "bio");
+  results.success
+    ? toast.success(results.message)
+    : toast.error(results.message);
+  return;
+};
+
+const onSubmit = handleSubmit(async (data, actions) => {
+  if (data.country === "Select Country")
+    return actions.setFieldError("country", "Select a country");
+
+  if (
+    defaultData.value.avatar === file.value &&
+    firstName.value === defaultData.value.firstName &&
+    lastName.value === defaultData.value.lastName &&
+    dob.value.toLocaleDateString() === defaultData.value.dob &&
+    email.value === defaultData.value.email &&
+    country.value === defaultData.value.country
+  )
+    return;
+
+  const formData = new FormData();
+
+  const fileReturn = await fileObject(imageObject[0]);
+  console.log(fileReturn);
+  formData.append("avatar", fileReturn[0]);
+  formData.append("firstName", data.firstName);
+  formData.append("lastName", data.lastName);
+  formData.append("email", data.email);
+  formData.append("dob", data.dob.toLocaleDateString());
+  formData.append("country", data.country);
+  formData.append("schema", "personal");
+  formData.append(
+    "defaultAvatar",
+    file.value === defaultData.value.avatar ? "true" : "false"
+  );
+  formData.append("avatarUrl", file.value);
+  const results = await updateUserProfile(formData, "personal");
+  results.success
+    ? toast.success(results.message)
+    : toast.error(results.message);
+  return;
 });
+
+// Pa$$w0rd!
 </script>
 
 <template>
@@ -39,18 +127,28 @@ const onSubmit = handleSubmit((data) => {
       <label for="email" class="mb-2 flex justify-between"
         ><span><i class="pi pi-info-circle text-baseRed mr-4"></i> Bio :</span>
         <p class="italic text-gray-600 text-sm">
-          Count: {{ bio.length }} / 300
+          Count: {{ bio.bio.length }} / 500
         </p></label
       >
       <textarea
-        v-model="bio"
+        v-model="bio.bio"
+        @input="bioChange"
         name="bio"
-        maxlength="300"
-        class="border-2 w-full rounded-md resize-none h-30"
-        minlength="30"
+        maxlength="500"
+        :class="`${
+          bio.bioError ? 'border-red-500 focus:outline-hidden' : 'border-alice'
+        } border-2 w-full rounded-md resize-none h-30 p-2`"
       ></textarea>
+      <span class="text-red-500 my-2 block text-sm">{{ bio.bioError }}</span>
+      <button
+        type="button"
+        :class="`${solidButton} flex items-center gap-2 justify-center`"
+        @click="bioSubmit"
+      >
+        <i class="pi pi-info-circle text-baseRed"></i>Change Bio
+      </button>
     </div>
-    <Avatar v-model:file="file" text="Change Avatar" :size="3" />
+    <Avatar v-model:file="file" text="Change Avatar" :size="3" :avatar="file" />
     <div class="flex justify-between mb-4 gap-2">
       <div class="w-full">
         <label for="firstName" class="block mb-2"
@@ -149,7 +247,9 @@ const onSubmit = handleSubmit((data) => {
           v-model="country"
           name="country"
           id="country"
-          class="rounded p-2 border w-full bg-eerie"
+          :class="`${
+            errors.country ? 'border-2 border-red-500' : 'border'
+          } border rounded-md p-2 bg-eerie w-full`"
         >
           <option value="Select Country" disabled hidden>Select Country</option>
           <option v-for="(count, i) in countries" :value="count.name" :key="i">
@@ -157,12 +257,13 @@ const onSubmit = handleSubmit((data) => {
           </option>
         </select>
       </div>
+      <span class="text-red-500 mt-2 block text-sm">{{ errors.country }}</span>
     </div>
 
     <button
       :disabled="isSubmitting"
       type="submit"
-      class="w-full mb-4 rounded p-2 cursor-pointer border flex place-content-center bg-alice text-eerie hover:bg-eerie hover:text-alice"
+      :class="`${solidButton} flex place-content-center`"
     >
       <span v-if="isSubmitting" class="flex gap-4 items-center justify-center"
         >Updating...<VueSpinnerBars size="30" class="text-baseRed"

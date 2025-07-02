@@ -8,6 +8,7 @@ export const api = wrapper(
   axios.create({ jar: jar, baseURL: "http://localhost:5000/api" })
 );
 
+// Check user is signed in
 export const checkAuth = async () => {
   const results = await api
     .get("/checkUser", {
@@ -18,6 +19,7 @@ export const checkAuth = async () => {
   return results;
 };
 
+// User account creation and login and logout
 export const registerUser = async (form: FormData) => {
   console.log(form);
   const results = await api
@@ -64,4 +66,38 @@ export const logout = async () => {
     .then((res) => res.data)
     .catch((err) => err.response.data);
   return results;
+};
+
+// User profile
+export const getUserProfile = async () => {
+  const results = await api
+    .get("/user/profile", { withCredentials: true })
+    .then((res) => res.data)
+    .catch((err) => err.response.data);
+  return results;
+};
+
+export const updateUserProfile = async (
+  formData: Object | FormData,
+  schema: "bio" | "personal"
+) => {
+  if (schema === "bio") {
+    const results = await api
+      .post("/user/profile", formData, { withCredentials: true })
+      .then((res) => res.data)
+      .catch((error) => error.response.data);
+    return results;
+  }
+  if (schema === "personal") {
+    const results = await api
+      .post("/user/profile", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      })
+      .then((res) => res.data)
+      .catch((error) => error.response.data);
+    return results;
+  }
 };

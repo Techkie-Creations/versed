@@ -7,6 +7,7 @@ import User from "../models/UserModel.js";
 import { codeGenerator, fullName, verseEncoder } from "../helper/misc.js";
 import { generateAccessToken, generateRefreshToken } from "../helper/tokens.js";
 import dotenv from "dotenv";
+import { uploadImage } from "../cloudinary.js";
 
 dotenv.config();
 
@@ -47,17 +48,13 @@ router.post("/register", upload.single("avatar"), async (req, res) => {
 
   let avatarUrl =
     "https://res.cloudinary.com/dz6l4si8o/image/upload/v1749147924/Versed%20Avatars/default.jpg";
+  let avatarId = null;
   if (defaultAvatar === "false") {
     try {
-      const b64 = Buffer.from(req.file.buffer).toString("base64");
-      const dataURI = `data:${req.file.mimetype};base64,${b64}`;
-      const clouded = await cloudinary.uploader.upload(dataURI, {
-        folder: "Versed Avatars",
-        use_filename: true,
-        unique_filename: false,
-        overwrite: true,
-      });
-      avatarUrl = clouded.secure_url;
+      [avatarUrl, avatarId] = await uploadImage(
+        req.file.buffer,
+        req.file.mimetype
+      );
     } catch (error) {
       console.error(error, "Failed");
       return res.status(500).json({
@@ -79,6 +76,7 @@ router.post("/register", upload.single("avatar"), async (req, res) => {
     avatar: avatarUrl,
     favVerse,
     verseEncoded,
+    avatarId: avatarId,
   });
 
   try {
@@ -175,7 +173,6 @@ router.post("/forgotPassword", async (req, res) => {
 
     if (verseEncoder(`${book} ${chapter}:${verse}`, encryptedVerse)) {
       resetCode[`${email}`] = codeGenerator(5);
-      console.log(resetCode);
       return res.status(202).json({
         success: true,
         message: "Able to reset password",
@@ -190,7 +187,6 @@ router.post("/forgotPassword", async (req, res) => {
     const { code, resend } = req.body;
     if (resend) {
       resetCode[`${email}`] = codeGenerator(5);
-      console.log(resetCode);
       return res
         .status(200)
         .json({ success: true, message: "Resent the code!" });

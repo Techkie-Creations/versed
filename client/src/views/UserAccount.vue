@@ -175,11 +175,11 @@ const links = [
       <p class="border-t-2 border-b-2 mt-10 text-center text-[1.2rem]">
         Delete Account
       </p>
-      <div class="bg-baseRed rounded-md mt-4">
+      <div class="bg-baseRed rounded-md mt-4 py-4">
         <p class="text-black font-bold text-center py-4">
           <i class="pi pi-exclamation-triangle" style="font-size: 6rem"></i>
           <span class="font-bolder block">NOTE:</span>
-          Once confirmed, your account will be deleted forever.
+          Once confirmed, your account will be deleted permanently.
         </p>
         <button
           type="button"

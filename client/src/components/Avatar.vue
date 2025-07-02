@@ -4,11 +4,15 @@ import { defaultFileObj, imageObject } from "@/utils/Types";
 import { Button } from "primevue";
 
 const file = defineModel("file");
-defineProps({
+const props = defineProps({
   text: String,
   size: {
     type: Number,
     default: 5,
+  },
+  avatar: {
+    type: String,
+    default: defaultAvatar,
   },
 });
 
@@ -47,7 +51,7 @@ const handleRemoval = async () => {
   const files = document.getElementById("file");
   if (files instanceof HTMLInputElement) {
     files.value = "";
-    file.value = defaultAvatar;
+    file.value = props.avatar;
     const { fileUrl, fileName, fileType } = imageObject[0];
     URL.revokeObjectURL(fileUrl);
     await fileObject({ fileUrl, fileName, fileType }, true);
@@ -79,7 +83,7 @@ const handleRemoval = async () => {
         id="file"
       />
       <Button
-        v-if="file !== defaultAvatar"
+        v-if="file !== props.avatar"
         icon="pi pi-times"
         v-tooltip.top="{
           value: 'Remove image',
