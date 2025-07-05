@@ -72,6 +72,24 @@ export const codeGenerator = (num) => {
   return code;
 };
 
+/**
+ * Used to check if the days elapsed between change date and current date is sufficient for change
+ * @param {*} changeDate Date when the change was made
+ * @param {*} daysElapsed How many days must have elapsed before change is possible
+ * @returns [boolean, daysElapsed - changeDate || null]
+ */
+export const checkDate = (changeDate, daysElapsed) => {
+  if (!changeDate) return [true, null];
+  const daysLeft = Math.floor(
+    Math.abs(new Date() - new Date(changeDate)) / (1000 * 60 * 60 * 24)
+  );
+  const today = new Date().toLocaleDateString();
+
+  if (daysLeft < daysElapsed || today === existingUser.passwordChanged)
+    return [false, daysElapsed - daysLeft];
+  return [true, null];
+};
+
 // import axios from "axios";
 // import fs from "fs";
 // export const getCountries = async () => {

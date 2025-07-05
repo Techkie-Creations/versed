@@ -35,8 +35,6 @@ router.post("/register", upload.single("avatar"), async (req, res) => {
     defaultAvatar,
   } = req.body;
 
-  console.log(req.file);
-
   if (await validation(email, "signup"))
     return res.status(400).json({
       success: false,
@@ -65,7 +63,7 @@ router.post("/register", upload.single("avatar"), async (req, res) => {
     }
   }
 
-  const favVerse = `${book} ${chapter} ${verse} ${version}`;
+  const securityVerse = `${book} ${chapter} ${verse} ${version}`;
   const verseEncoded = verseEncoder(`${book} ${chapter}:${verse}`);
 
   const newUser = new User({
@@ -74,7 +72,7 @@ router.post("/register", upload.single("avatar"), async (req, res) => {
     email: email.toLowerCase(),
     password: hashedPassword,
     avatar: avatarUrl,
-    favVerse,
+    securityVerse,
     verseEncoded,
     avatarId: avatarId,
   });
@@ -86,13 +84,13 @@ router.post("/register", upload.single("avatar"), async (req, res) => {
 
     res
       .cookie("refreshToken", refreshToken, {
-        expires: new Date(Date.now() + 3 * 60 * 1000),
+        expires: new Date(Date.now() + 3 * 60 * 60 * 1000),
         httpOnly: true,
         domain: "localhost",
         path: "/",
       })
       .cookie("accessToken", generateAccessToken(newUser._id), {
-        expires: new Date(Date.now() + 2 * 60 * 1000),
+        expires: new Date(Date.now() + 3 * 60 * 60 * 1000),
         httpOnly: true,
         domain: "localhost",
         path: "/",
@@ -123,8 +121,6 @@ router.post("/login", async (req, res) => {
       .json({ success: false, message: "Invalid Email or Password!" });
   const matching = await bcrypt.compare(password, existingUser.password);
 
-  console.log(matching);
-
   if (matching)
     return res
       .cookie("refreshToken", generateRefreshToken(existingUser._id), {
@@ -154,7 +150,6 @@ router.post("/login", async (req, res) => {
 let resetCode = {};
 
 router.post("/forgotPassword", async (req, res) => {
-  console.log(req.body);
   const { section, email } = req.body;
 
   if (section === "email") {
@@ -211,29 +206,9 @@ router.post("/forgotPassword", async (req, res) => {
     } catch (error) {
       console.error(error);
       return res
-        .status(200)
+        .status(500)
         .json({ success: false, message: "Server Error... Try Again Later!" });
     }
-  }
-});
-
-router.post("/changePassword", async (req, res) => {
-  const { password, email } = req.body;
-
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await User.findOneAndUpdate(
-      { email: email },
-      { password: hashedPassword },
-      { new: true }
-    );
-    return res
-      .status(200)
-      .json({ success: true, message: "Password Reset Successfull!" });
-  } catch (error) {
-    return res
-      .status(200)
-      .json({ success: false, message: "Server Error... Try Again Later!" });
   }
 });
 

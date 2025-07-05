@@ -8,7 +8,7 @@ const props = defineProps({
   text: String,
   size: {
     type: Number,
-    default: 5,
+    default: 4,
   },
   avatar: {
     type: String,
@@ -38,10 +38,10 @@ const handleFileChange = async (e) => {
     if (fileUrl && fileName) {
       if (file instanceof HTMLInputElement) {
         file.files = await fileObject({ fileUrl, fileName, fileType }, false);
-        console.log(
-          "OBJ",
-          await fileObject({ fileUrl, fileName, fileType }, false)
-        );
+        // console.log(
+        //   "OBJ",
+        //   await fileObject({ fileUrl, fileName, fileType }, false)
+        // );
       }
     }
   }
@@ -70,7 +70,7 @@ const handleRemoval = async () => {
       <img
         :src="`${file}`"
         alt="avatar"
-        :class="`w-[${size}rem] h-[${size}rem] rounded-[50%] object-fill object-center`"
+        :class="`w-[${size}rem] h-[4rem] rounded-[50%] object-fit object-center border-1 border-alice`"
       />
       <input
         @change="handleFileChange($event)"

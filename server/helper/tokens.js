@@ -10,7 +10,6 @@ export const generateAccessToken = (userId) => {
     expiresIn: "3h",
     issuer: `http://localhost:${process.env.PORT || 5000}`,
   });
-  console.log(accessToken, "ACCESS TOKEN");
   return accessToken;
 };
 
@@ -28,7 +27,6 @@ export const generateRefreshToken = (userId) => {
       issuer: `http://localhost:${process.env.PORT || 5000}`,
     }
   );
-  console.log(refreshToken, "REFRESH TOKEN");
   return refreshToken;
 };
 

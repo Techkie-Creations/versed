@@ -16,7 +16,7 @@ const UserSchema = new mongoose.Schema(
     },
     password: reqString,
     avatar: reqString,
-    favVerse: reqString,
+    securityVerse: reqString,
     verseEncoded: reqString,
     bio: {
       type: String,
@@ -25,6 +25,8 @@ const UserSchema = new mongoose.Schema(
     dob: String,
     country: String,
     avatarId: String,
+    passwordChanged: String,
+    verseChanged: String,
   },
   {
     timestamps: true,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { forgotPassword } from "@/api/api";
+import { changePassword, forgotPassword } from "@/api/api";
 import { passwordResetSchema } from "@/utils/ValidationSchemas";
 import { useField, useForm } from "vee-validate";
 import { ref } from "vue";
@@ -19,6 +19,10 @@ const props = defineProps({
     type: String,
     default: "forgot",
   },
+  codeSend: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const code = ref("");
@@ -28,6 +32,8 @@ const isLoading = ref(false);
 const userEmail = ref(props.email);
 
 const toast = useToast();
+
+const emitted = defineEmits(["pwdReset"]);
 
 const { handleSubmit, isSubmitting, errors } = useForm({
   validationSchema: passwordResetSchema,
@@ -78,16 +84,28 @@ const handlePasswordReset = handleSubmit(async (data) => {
     return;
   }
   if (props.schema === "change") {
+    const formData = { section: "pwdReset", password: password.value };
+    const results = await changePassword(formData);
+    if (results.success) {
+      toast.success(results.message);
+      emitted("pwdReset", false);
+      return;
+    }
+    toast.error(results.message);
+    return;
   }
 });
 </script>
 
 <template>
   <div class="text-center">
-    <label for="codeOrPwd" class="text-center block text-4xl mt-10 mb-6">{{
-      correctCode ? "Reset Password" : "Enter Code"
-    }}</label>
-    <div v-if="!correctCode" class="text-center">
+    <label
+      v-if="codeSend"
+      for="codeOrPwd"
+      class="text-center block text-4xl mt-10 mb-6"
+      >{{ correctCode ? "Reset Password" : "Enter Code" }}</label
+    >
+    <div v-if="!correctCode && codeSend" class="text-center">
       <!-- <OTP
         :length="5"
         @entered="(v) => handleCode(v)"
@@ -117,7 +135,7 @@ const handlePasswordReset = handleSubmit(async (data) => {
     </div>
     <form
       @submit.prevent="handlePasswordReset"
-      v-if="correctCode"
+      v-if="correctCode || !codeSend"
       class="w-[50vw] mx-auto"
     >
       <PasswordConfirmation

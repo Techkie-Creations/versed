@@ -19,7 +19,6 @@ export const uploadImage = async (buffer, mimetype) => {
 };
 
 export const deleteImage = async (publicId) => {
-  console.log("HIT");
   try {
     await cloudinary.uploader.destroy(publicId);
     return true;

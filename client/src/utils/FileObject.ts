@@ -7,7 +7,7 @@ const blobToFile = (blob: Blob, fileName: string) => {
 };
 
 export const defaultAvatar =
-  "https://res.cloudinary.com/dz6l4si8o/image/upload/v1749147924/Versed%20Avatars/default.jpg";
+  "https://res.cloudinary.com/dz6l4si8o/image/upload/v1751675985/Versed%20Avatars/default.jpg";
 
 export const fileObject = async (
   { fileUrl, fileName }: ImageURL = defaultFileObj,
@@ -42,6 +42,7 @@ export const tooltipTheme = {
         padding: ".5rem",
         borderRadius: ".5rem",
         fontSize: ".9rem",
+        marginLeft: ".5rem",
       },
     },
   },

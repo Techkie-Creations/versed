@@ -5,11 +5,19 @@ import { RouterLink } from "vue-router";
 import { VueSpinnerBars } from "vue3-spinners";
 import { useToast } from "vue-toastification";
 import router from "@/router";
+import { Popover } from "primevue";
+import { solidButton } from "@/utils/Types";
+import { tooltipTheme } from "@/utils/FileObject";
 
 const userInfo = ref({ name: "", avatar: "", isAuth: false });
 
 const isLoading = ref(false);
 const showNames = ref(false);
+const popOver = ref();
+
+const toggle = () => {
+  popOver.value.toggle(event);
+};
 
 const toast = useToast();
 
@@ -106,12 +114,23 @@ const handleLogout = async () => {
             >Contact Us</RouterLink
           >
         </li>
-        <RouterLink to="/auth/login"
-          ><i
+        <button type="button" @click="toggle">
+          <i
             class="pi pi-user border-2 p-2 rounded text-2xl hover:cursor-pointer hover:bg-alice hover:text-eerie"
+            style="font-size: x-large"
           >
-          </i
-        ></RouterLink>
+          </i>
+        </button>
+        <Popover ref="popOver" class="mt-2 p-2 bg-alice">
+          <div class="flex flex-col gap-4 w-30">
+            <RouterLink to="/auth/login" :class="solidButton">
+              <i class="pi pi-sign-in mr-4"></i> Login
+            </RouterLink>
+            <RouterLink to="/auth/signup" :class="solidButton">
+              <i class="pi pi-user-plus mr-4"></i> Sign Up
+            </RouterLink>
+          </div>
+        </Popover>
       </ul>
     </nav>
     <nav class="w-1/3" v-if="userInfo.isAuth">
@@ -120,7 +139,7 @@ const handleLogout = async () => {
           class="hover:bg-alice hover:text-eerie p-2 rounded-md flex items-center ease-in-out duration-300"
         >
           <RouterLink
-            to="/my-account"
+            to="/user/my-account"
             class="flex items-center gap-2 hover:underline font-bold"
             >{{ userInfo.name
             }}<img
@@ -171,6 +190,10 @@ const handleLogout = async () => {
         <RouterLink
           v-if="['Logout', 'Bars'].indexOf(list.name) === -1"
           :to="'/'"
+          v-tooltip.right="{
+            value: list.name,
+            ...tooltipTheme,
+          }"
           class="hover:bg-alice hover:text-eerie p-2 rounded-md flex items-center ease-in-out duration-300"
         >
           <div class="flex gap-2">
@@ -178,9 +201,18 @@ const handleLogout = async () => {
             <p v-if="showNames">{{ list.name }}</p>
           </div>
         </RouterLink>
-        <div class="flex gap-2" v-if="list.name === 'Logout' && !isLoading">
-          <i :class="list.icon" style="font-size: 1.6rem"></i>
-          <p v-if="showNames">{{ list.name }}</p>
+        <div
+          class="w-full"
+          v-if="list.name === 'Logout' && !isLoading"
+          v-tooltip.right="{
+            value: list.name,
+            ...tooltipTheme,
+          }"
+        >
+          <span class="flex gap-2 w-full"
+            ><i :class="list.icon + ' block'" style="font-size: 1.6rem"></i>
+            <p v-if="showNames">{{ list.name }}</p></span
+          >
         </div>
         <span v-if="list.name === 'Logout' && isLoading" class="flex gap-2">
           <p v-if="showNames">Logging Out...</p>

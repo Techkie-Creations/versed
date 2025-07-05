@@ -31,7 +31,7 @@ const router = createRouter({
       component: ForgotPassword,
     },
     {
-      path: "/my-accounts",
+      path: "/user/my-account",
       name: "account",
       component: UserAccount,
     },

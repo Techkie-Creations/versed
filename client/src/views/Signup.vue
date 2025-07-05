@@ -172,7 +172,7 @@ const onSubmit = handleSubmit(async (data, action) => {
     />
 
     <VerseSelector
-      title="Favorite Verse"
+      title="Security Verse"
       v-model:version="version"
       v-model:book="book"
       v-model:chapter="chapter"

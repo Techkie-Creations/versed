@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { solidButton } from "@/utils/Types";
+import { getUserSocials, updateUserSocials } from "@/api/api";
+import { inputFocus, solidButton } from "@/utils/Types";
 import { InputGroupAddon, InputGroup } from "primevue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import { useToast } from "vue-toastification";
 
 const socials = ref({
   facebook: "",
@@ -18,49 +20,93 @@ const socialsErr = ref({
   instagram: "",
   linkedin: "",
 });
+
+const defaultVals = ref({
+  facebook: "",
+  x: "",
+  instagram: "",
+  web: "",
+  linkedin: "",
+});
+const defaults = ref(
+  Object.keys(socials.value).filter(
+    (val1) => socials.value[val1] === defaultVals.value[val1]
+  ).length === 5
+);
+
+const toast = useToast();
+
 const errMsg = {
-  facebook: "Invalid Facebook profile URL",
-  x: "Must be only username such as: @johndoe or john_doe",
+  facebook: "Must be only username such as: @johndoe or @john.doe",
+  x: "Must be only username such as: @johndoe or @john_doe12",
   web: "Invalid site URL",
   linkedin: "Invalid LinkedIn profile URL",
-  instagram: "Must be only username such as: @johndoe or john_doe or john.doe",
+  instagram: "Must be only username such as: @johndoe or @john_doe12",
 };
 
+onMounted(async () => {
+  const results = await getUserSocials();
+  if (results.success) {
+    if (results.socials) {
+      socials.value = {
+        linkedin: results.socials.linkedIn || "",
+        web: results.socials.web || "",
+        instagram: results.socials.instagram || "",
+        x: results.socials.x || "",
+        facebook: results.socials.facebook || "",
+      };
+      defaultVals.value = {
+        linkedin: results.socials.linkedIn || "",
+        web: results.socials.web || "",
+        instagram: results.socials.instagram || "",
+        x: results.socials.x || "",
+        facebook: results.socials.facebook || "",
+      };
+    }
+  }
+});
+
 const handleChange = (link: string, re: RegExp) => {
-  if (socials.value[link].length >= 1 && !re.test(socials.value[link])) {
+  defaults.value =
+    Object.keys(socials.value).filter(
+      (val1) => socials.value[val1] === defaultVals.value[val1]
+    ).length === 5;
+  if (socials.value[link].length >= 1 && !socials.value[link].match(re)) {
     socialsErr.value[link] = errMsg[link];
-  } else socialsErr.value[link] = "";
+  } else {
+    socialsErr.value[link] = "";
+  }
 };
 
 const socialLinks = [
   {
     name: "Facebook",
-    placeholder: "https://fb.com/username",
+    placeholder: "@janehella",
     icon: "pi pi-facebook",
-    regex:
-      /(?:http:\/\/)?(?:www\.)?facebook\.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[\w\-]*\/)*([\w\-]*)/g,
+    regex: /^(\@)([a-z0-9A-Z_.-]{1,15})$/gi,
   },
   {
     name: "Instagram",
     placeholder: "@john.doe",
     icon: "pi pi-instagram",
-    regex: /^[\w](?!.*?\.{2})[\w.]{1,28}[\w]$/,
+    regex: /^(\@)[\w](?!.*?\.{2})[\w.]{1,28}[\w]$/gi,
   },
   {
     name: "X",
     placeholder: "@thomas",
     icon: "pi pi-twitter",
-    regex: /^(\@)?([a-z0-9_]{1,15})$/i,
+    regex: /^(\@)(\w{1,15})$/gi,
   },
   {
     name: "LinkedIn",
-    placeholder: "https://fb.com/username",
+    placeholder: "https://za.linkedin.com/in/john-doe",
     icon: "pi pi-linkedin",
-    regex: /^(http(s)?:\/\/)?([\w]+\.)?linkedin\.com\/(pub|in|profile)/gm,
+    regex:
+      /^(http(s)?:\/\/)?([\w]+\.)?linkedin\.com\/(pub|in|profile)\/([a-zA-Z_-]+)/gi,
   },
   {
     name: "Web",
-    placeholder: "https://fb.com/username",
+    placeholder: "https://www.mysite.com",
     icon: "pi pi-link",
     regex: new RegExp(
       "^(https?:\\/\\/)?" + // protocol
@@ -73,6 +119,34 @@ const socialLinks = [
     ), // fragment locator,
   },
 ];
+
+const onSubmit = async () => {
+  if (
+    Object.values(socialsErr.value)
+      .filter((val) => val.length >= 1)
+      .join("").length >= 1 ||
+    Object.values(socials.value).filter((val) => val.length === 0).length ===
+      5 ||
+    defaults.value
+  )
+    return;
+
+  const formData = {
+    facebook: socials.value.facebook,
+    x: socials.value.x,
+    linkedIn: socials.value.linkedin,
+    web: socials.value.web,
+    instagram: socials.value.instagram,
+  };
+  const results = await updateUserSocials(formData);
+  if (results.success) {
+    toast.success(results.message);
+    defaults.value = true;
+    return;
+  }
+  toast.error(results.message);
+  return;
+};
 </script>
 
 <template>
@@ -85,11 +159,6 @@ const socialLinks = [
             : 'bg-eerie border-2 border-alice border-r-0'
         "
       >
-        <!-- :class="`${
-          errors.password
-            ? 'border-2 border-red-500 bg-red-500 text-alice'
-            : 'text-baseRed'
-        }` -->
         <i :class="social.icon" style="font-size: larger; color: aliceblue"></i>
       </InputGroupAddon>
       <input
@@ -101,7 +170,7 @@ const socialLinks = [
           socialsErr[social.name.toLowerCase()]
             ? 'border-2 border-red-500 border-l-0'
             : 'border-r-2 border-t-2 border-b-2'
-        } rounded-l-none rounded-md p-2 w-full focus:outline-0`"
+        } rounded-l-none rounded-md p-2 w-full ${inputFocus}`"
         :placeholder="social.placeholder"
       />
     </InputGroup>
@@ -121,11 +190,13 @@ const socialLinks = [
       socialsErr.linkedin.length !== 0 ||
       socialsErr.instagram.length !== 0 ||
       socialsErr.x.length !== 0 ||
-      socialsErr.web.length !== 0
+      socialsErr.web.length !== 0 ||
+      defaults
         ? 'hover:cursor-not-allowed bg-gray-700 border-gray-800'
         : solidButton
-    } border-2 p-2 rounded-md w-full mt-2`"
+    } border-2 p-2 rounded-md w-full mt-2 flex justify-center items-center gap-2`"
+    @click="onSubmit"
   >
-    Add Links
+    <i class="pi pi-link"></i>Add Links
   </button>
 </template>

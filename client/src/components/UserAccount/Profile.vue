@@ -98,7 +98,6 @@ const onSubmit = handleSubmit(async (data, actions) => {
   const formData = new FormData();
 
   const fileReturn = await fileObject(imageObject[0]);
-  console.log(fileReturn);
   formData.append("avatar", fileReturn[0]);
   formData.append("firstName", data.firstName);
   formData.append("lastName", data.lastName);
@@ -112,9 +111,12 @@ const onSubmit = handleSubmit(async (data, actions) => {
   );
   formData.append("avatarUrl", file.value);
   const results = await updateUserProfile(formData, "personal");
-  results.success
-    ? toast.success(results.message)
-    : toast.error(results.message);
+  if (!results.success) {
+    toast.error(results.message);
+    if (results.field) actions.setFieldError("email", results.message);
+    return;
+  }
+  toast.success(results.message);
   return;
 });
 
@@ -148,7 +150,7 @@ const onSubmit = handleSubmit(async (data, actions) => {
         <i class="pi pi-info-circle text-baseRed"></i>Change Bio
       </button>
     </div>
-    <Avatar v-model:file="file" text="Change Avatar" :size="3" :avatar="file" />
+    <Avatar v-model:file="file" text="Change Avatar" :size="4" :avatar="file" />
     <div class="flex justify-between mb-4 gap-2">
       <div class="w-full">
         <label for="firstName" class="block mb-2"
