@@ -1,3 +1,7 @@
 node_modules
 README*.txt
 *logs
+*.rest
+avatar
+.env
+.vscode
