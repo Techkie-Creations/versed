@@ -7,7 +7,7 @@ import VerseSelector from "@/components/VerseSelector.vue";
 import PasswordReset from "@/components/PasswordReset.vue";
 import { InputGroup, InputGroupAddon, Button } from "primevue";
 import Socials from "@/components/UserAccount/Socials.vue";
-import { solidButton } from "@/utils/Types";
+import { solidButton } from "@/utils/exports";
 import {
   changePassword,
   deleteUserAccount,

@@ -24,12 +24,9 @@ export const fileObject = async (
     .get(fileUrl, { responseType: "blob" })
     .then((res) => res.data)
     .catch(() => false);
-  // console.log(results);
   const imageFileObject: File = blobToFile(results, fileName);
-  //   console.log(imageFileObject, "FILE");
 
   dataTransfer.items.add(imageFileObject);
-  //   console.log("data", dataTransfer.files);
   return dataTransfer.files;
 };
 

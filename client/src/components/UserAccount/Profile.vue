@@ -8,7 +8,8 @@ import countries from "@/assets/countries.json";
 import { changeInfo } from "@/utils/ValidationSchemas";
 import { VueSpinnerBars } from "vue3-spinners";
 import { getUserProfile, updateUserProfile } from "@/api/api";
-import { imageObject, solidButton } from "@/utils/Types";
+import { imageObject } from "@/utils/Types";
+import { solidButton } from "@/utils/exports";
 import { useToast } from "vue-toastification";
 
 const file = ref(defaultAvatar);

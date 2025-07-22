@@ -90,25 +90,7 @@ export const checkDate = (changeDate, daysElapsed) => {
   return [true, null];
 };
 
-// import axios from "axios";
-// import fs from "fs";
-// export const getCountries = async () => {
-//   let obj = [];
-//   const countries = await axios
-//     .get("https://www.apicountries.com/countries")
-//     .then((res) => res.data)
-//     .catch((err) => err.response.data);
-//   for (let i = 0; i < countries.length; i++) {
-//     const bracket = countries[i]["name"].indexOf("(");
-//     console.log(bracket);
-//     if (bracket >= 0) {
-//       obj.push({
-//         name: countries[i]["name"].slice(0, bracket),
-//         flag: countries[i]["flag"],
-//       });
-//     }
-//     obj.push({ name: countries[i]["name"], flag: countries[i]["flag"] });
-//   }
-// };
-
-// getCountries();
+export const verseId = (userId) => {
+  const id = userId.substring(0, 7) + "-versed-" + userId.substring(14, 21);
+  return id;
+};

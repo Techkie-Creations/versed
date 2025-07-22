@@ -8,6 +8,7 @@ import { codeGenerator, fullName, verseEncoder } from "../helper/misc.js";
 import { generateAccessToken, generateRefreshToken } from "../helper/tokens.js";
 import dotenv from "dotenv";
 import { uploadImage } from "../cloudinary.js";
+import Verses from "../models/VerseModel.js";
 
 dotenv.config();
 
@@ -79,6 +80,11 @@ router.post("/register", upload.single("avatar"), async (req, res) => {
 
   try {
     await newUser.save();
+
+    const versesReg = new Verses({
+      userId: newUser._id,
+      globalVersion: version,
+    });
 
     const refreshToken = generateRefreshToken(newUser._id);
 

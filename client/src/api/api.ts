@@ -154,3 +154,29 @@ export const deleteUserAccount = async () => {
     .catch((err) => err.response);
   return results;
 };
+
+/* VERSES */
+// Get Verses
+export const getVerses = async () => {
+  const results = await api
+    .get("/verses/my-verses", { withCredentials: true })
+    .then((res) => res.data)
+    .catch((err) => err.response);
+  return results;
+};
+
+export const saveVerses = async (formData: Object) => {
+  const results = await api
+    .post("/verses/my-verses", formData, { withCredentials: true })
+    .then((res) => res.data)
+    .catch((err) => err.response);
+  return results;
+};
+
+export const deleteVerses = async () => {
+  const results = await api
+    .delete("/verses/my-verses", { withCredentials: true })
+    .then((res) => res.data)
+    .catch((err) => err.response);
+  return results;
+};

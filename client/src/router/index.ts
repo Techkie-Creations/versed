@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Landing from "../views/Landing.vue";
 import Signup from "@/views/Signup.vue";
-import NotFound from "@/views/NotFound.vue";
 import Login from "../views/Login.vue";
 import ForgotPassword from "@/views/ForgotPassword.vue";
 import { Authenticated } from "@/utils/Authentication";
 import UserAccount from "@/views/UserAccount.vue";
+import VerseManager from "@/views/VerseManager.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,9 +36,14 @@ const router = createRouter({
       component: UserAccount,
     },
     {
-      path: "/:catchAll(.*)",
+      path: "/my-verses",
+      name: "verses",
+      component: VerseManager,
+    },
+    {
+      path: "/:catchAll(.*)*",
       name: "notfound",
-      component: NotFound,
+      component: () => import("@/views/NotFound.vue"),
     },
   ],
 });

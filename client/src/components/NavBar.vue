@@ -6,7 +6,7 @@ import { VueSpinnerBars } from "vue3-spinners";
 import { useToast } from "vue-toastification";
 import router from "@/router";
 import { Popover } from "primevue";
-import { solidButton } from "@/utils/Types";
+import { solidButton } from "@/utils/exports";
 import { tooltipTheme } from "@/utils/FileObject";
 
 const userInfo = ref({ name: "", avatar: "", isAuth: false });
@@ -14,6 +14,7 @@ const userInfo = ref({ name: "", avatar: "", isAuth: false });
 const isLoading = ref(false);
 const showNames = ref(false);
 const popOver = ref();
+const sideNavWidth = ref(76);
 
 const toggle = () => {
   popOver.value.toggle(event);
@@ -34,38 +35,47 @@ const linkObjects = {
   bars: {
     icon: "pi pi-bars",
     name: "Bars",
+    link: "",
   },
   dashboard: {
     icon: "pi pi-desktop",
     name: "Dashboard",
+    link: "/dashboard",
   },
   notifications: {
     icon: "pi pi-bell",
     name: "Notifications",
+    link: "/notifications",
   },
   verses: {
     icon: "pi pi-book",
     name: "Verses",
+    link: "/my-verses",
   },
   exam: {
     icon: "pi pi-pencil",
     name: "Exam",
+    link: "/exam-mgmr",
   },
   newsfeed: {
     icon: "pi pi-globe",
     name: "Newsfeed",
+    link: "/newsfeed",
   },
   shop: {
     icon: "pi pi-shop",
     name: "Shop",
+    link: "/shop",
   },
   settings: {
     icon: "pi pi-cog",
     name: "Settings",
+    link: "/settings",
   },
   logout: {
     icon: "pi pi-sign-out",
     name: "Logout",
+    link: "",
   },
 };
 
@@ -84,7 +94,7 @@ const handleLogout = async () => {
 
 <template>
   <header
-    class="w-full px-8 py-4 flex justify-between items-center fixed border-b top-0 left-0 bg-eerie z-10"
+    :class="`w-full px-8 py-4 flex justify-between items-center fixed border-b top-0 left-0 bg-eerie z-10`"
   >
     <img
       src="@/assets/logo.svg"
@@ -151,9 +161,11 @@ const handleLogout = async () => {
       </ul>
     </nav>
   </header>
-  <aside
+  <div
+    ref="sideNavWidth"
     class="w-auto fixed h-full z-99 top-0 left-0 bg-eerie"
     v-if="userInfo.isAuth"
+    id="sideNav"
   >
     <nav
       :class="`border-r-2 flex flex-col gap-4 p-4 ${
@@ -189,7 +201,8 @@ const handleLogout = async () => {
         </div>
         <RouterLink
           v-if="['Logout', 'Bars'].indexOf(list.name) === -1"
-          :to="'/'"
+          :to="list.link"
+          active-class="bg-alice text-eerie border-1 border-alice hover:text-baseRed! hover:bg-eerie "
           v-tooltip.right="{
             value: list.name,
             ...tooltipTheme,
@@ -223,5 +236,5 @@ const handleLogout = async () => {
         <i class="pi pi-sign-out" style="font-size: 1.6rem"></i>
       </li> -->
     </nav>
-  </aside>
+  </div>
 </template>

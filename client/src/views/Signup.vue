@@ -61,12 +61,7 @@ const onSubmit = handleSubmit(async (data, action) => {
       verse: verse.value === "Verse" ? "Required" : "",
     });
 
-  console.log(data);
-
   const fileReturn = await fileObject(imageObject[0]);
-  console.log("FILE RETURN", fileReturn[0]);
-
-  console.log(data.avatar[0], "NEW");
 
   formData.append(
     "avatar",
