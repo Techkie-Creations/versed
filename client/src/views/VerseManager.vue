@@ -15,7 +15,7 @@ import {
   getVerseSec,
   saveVerses,
   updateVerseSec,
-} from "@/api/api";
+} from "@/api/versesApi";
 import AddVerse from "@/components/VerseManager/AddVerse.vue";
 import { useToast } from "vue-toastification";
 import { Popover } from "primevue";
@@ -120,14 +120,16 @@ onMounted(async () => {
     numOfVerses.value = Object.keys(verses.value).length;
   }
 
-  if (results.mode === "Newbie") {
+  if (results.mode === "Mature") {
     const getSec = await getVerseSec();
-    //if (getSec.success) {
-    versePass.value = getSec.versePass;
-    verseVisible.value = getSec.verseVisibility || "private";
-    verseAccess.value = getSec.verseAccess;
-    verseDef.value.versePass = getSec.versePass;
-    //}
+    if (getSec.success) {
+      versePass.value = getSec.versePass;
+      verseVisible.value = getSec.verseVisibility || "private";
+      verseAccess.value = getSec.verseAccess;
+      verseDef.value.versePass = getSec.versePass;
+    } else {
+      toast.error(getSec.message);
+    }
   }
 
   const versesKey = Object.keys(verses.value);
@@ -203,8 +205,6 @@ const handleSave = async () => {
 
 const handleRemoval = (id: number, schema: "new" | "track") => {
   const removedKeys = Object.keys(removedVerses.value);
-
-  console.log(typeof id);
 
   if (schema === "track") {
     for (let i = 0; i < removedKeys.length; i++) {

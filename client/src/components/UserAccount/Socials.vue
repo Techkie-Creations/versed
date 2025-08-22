@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getUserSocials, updateUserSocials } from "@/api/api";
+import { getUserSocials, updateUserSocials } from "@/api/useraccApi";
 import { inputFocus, solidButton } from "@/utils/exports";
 import { InputGroupAddon, InputGroup } from "primevue";
 import { onMounted, ref } from "vue";

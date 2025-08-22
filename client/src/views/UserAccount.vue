@@ -13,7 +13,7 @@ import {
   deleteUserAccount,
   getSecVerse,
   updateSecVerse,
-} from "@/api/api";
+} from "@/api/useraccApi";
 import { useToast } from "vue-toastification";
 import Dialog from "primevue/dialog";
 import router from "@/router";

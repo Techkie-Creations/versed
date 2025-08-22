@@ -1,4 +1,4 @@
-import { checkAuth } from "@/api/api";
+import { checkAuth } from "@/api/base";
 import router from "@/router";
 
 export const Authenticated = async (toRoute: string = "") => {

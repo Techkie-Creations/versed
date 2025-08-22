@@ -188,11 +188,6 @@ router.post("/import-verses", validateToken, async (req, res) => {
         .json({ success: false, message: "Verse ID Not Found!" })
         .status(404);
     if (req.body.schema === "verseId") {
-      // if (getVerses.mode === "Newbie")
-      //   return res.json({
-      //     success: false,
-      //     message: "Unable To Import From This ID",
-      //   });
       if (getVerses.verseVisibility === "public") {
         if (getVerses.versePass.length > 0)
           return res.status(200).json({ success: true, pass: true });

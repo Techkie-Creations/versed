@@ -2,7 +2,7 @@
 import { hollowButton, solidButton } from "@/utils/exports";
 import { onMounted, ref } from "vue";
 import VerseSelector from "../VerseSelector.vue";
-import { getVerses } from "@/api/api";
+import { getVerses } from "@/api/versesApi";
 import ImportVerses from "./ImportVerses.vue";
 
 const verses = defineModel("verses", { type: Object });
@@ -29,7 +29,6 @@ onMounted(async () => {
 });
 
 const addVerse = (key: number) => {
-  // const position = track.value[Object.keys(track.value).length - 1];
   const errs: string[] = [];
   toVerse.value = toVerse.value === "To" ? "." : toVerse.value;
 
@@ -50,20 +49,6 @@ const addVerse = (key: number) => {
 
   const versesKeys = Object.keys(verses.value);
   const trackNewKeys = Object.keys(trackNew.value);
-
-  // const checkedVerse = checkExistingVerse(
-  //   verses.value,
-  //   trackNew.value,
-  //   book.value,
-  //   chapter.value,
-  //   verse.value,
-  //   toVerse.value,
-  //   versesKeys,
-  //   trackNewKeys
-  // );
-
-  // console.log(checkedVerse);
-  // if (!checkedVerse["status"]) return (errText.value = checkedVerse["message"]);
 
   for (let i = 0; i < trackNewKeys.length; i++) {
     const trackNewId = trackNew.value[trackNewKeys[i]];

@@ -60,5 +60,3 @@ app.listen(PORT, () => {
   connectDB();
   console.log(`Server started on http://localhost:${PORT}`);
 });
-
-// John@jon.com Kryptonium@7

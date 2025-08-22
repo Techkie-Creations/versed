@@ -3,7 +3,7 @@ import { useField, useForm } from "vee-validate";
 import { imageObject } from "@/utils/Types";
 import { fileObject, defaultAvatar } from "@/utils/FileObject";
 import { onMounted, ref } from "vue";
-import { registerUser } from "@/api/api";
+import { registerUser } from "@/api/authApi";
 import { VueSpinnerBars } from "vue3-spinners";
 import { useToast } from "vue-toastification";
 import { RegistrationSchema } from "@/utils/ValidationSchemas";

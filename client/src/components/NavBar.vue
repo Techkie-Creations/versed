@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { checkAuth, logout } from "@/api/api";
+import { checkAuth } from "@/api/base";
+import { logout } from "@/api/authApi";
 import { onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
 import { VueSpinnerBars } from "vue3-spinners";

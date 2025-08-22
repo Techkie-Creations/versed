@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { versesImport } from "@/api/api";
+import { versesImport } from "@/api/versesApi";
 import { checkVerses, hollowButton, solidButton } from "@/utils/exports";
 import { Dialog } from "primevue";
 import { ref } from "vue";
@@ -42,12 +42,10 @@ const importVerses = async () => {
     verseId: verseId.value,
     versePass: password.value,
   });
-  console.log(results);
   if (results.success) {
-    console.log(verseId.value);
     if (results.pass) return (section.value = "versePass");
     verseList.value = results.verses;
-    console.log(verseList.value);
+
     return;
   }
   errVerse.value.verses = results.message;
@@ -85,7 +83,6 @@ const importSelected = async () => {
   isLoading.value = true;
   arrange(selected.value);
   arrangeNew();
-  console.log(importedVerses.value);
   const allVerses = checkVerses(verses.value, importedVerses.value);
   if (!allVerses.status) {
     isLoading.value = false;

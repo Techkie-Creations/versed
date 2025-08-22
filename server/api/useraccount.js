@@ -195,7 +195,6 @@ router
     }
   });
 
-// Pa$$w0rd!
 // Change Password
 router.post("/changePassword", validateToken, async (req, res) => {
   const { section } = req.body;
@@ -205,12 +204,6 @@ router.post("/changePassword", validateToken, async (req, res) => {
         req.info.userId,
         "password passwordChanged"
       );
-      // const daysLeft = Math.floor(
-      //   Math.abs(new Date() - new Date(existingUser.passwordChanged)) /
-      //     (1000 * 60 * 60 * 24)
-      // );
-
-      // const today = new Date().toLocaleDateString();
 
       const [canChange, daysDiff] = checkDate(existingUser.passwordChanged, 7);
 

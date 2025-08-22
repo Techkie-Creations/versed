@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { changePassword, forgotPassword } from "@/api/api";
+import { forgotPassword } from "@/api/authApi";
+import { changePassword } from "@/api/useraccApi";
 import { passwordResetSchema } from "@/utils/ValidationSchemas";
 import { useField, useForm } from "vee-validate";
 import { ref } from "vue";
 import { useToast } from "vue-toastification";
-// import OTP from "./OTP.vue";
 import PasswordConfirmation from "./PasswordConfirmation.vue";
 import { VueSpinnerBars } from "vue3-spinners";
 import router from "@/router";

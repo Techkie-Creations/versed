@@ -37,8 +37,6 @@ const chapter = defineModel("chapter");
 const verse = defineModel("verse");
 const toVerse = defineModel("toVerse");
 
-// type VerseError = {book: string, chapter: string, verse: string}
-
 const errors = defineModel("errors", { type: Object });
 </script>
 

@@ -7,7 +7,7 @@ import { DatePicker } from "primevue";
 import countries from "@/assets/countries.json";
 import { changeInfo } from "@/utils/ValidationSchemas";
 import { VueSpinnerBars } from "vue3-spinners";
-import { getUserProfile, updateUserProfile } from "@/api/api";
+import { getUserProfile, updateUserProfile } from "@/api/useraccApi";
 import { imageObject } from "@/utils/Types";
 import { solidButton } from "@/utils/exports";
 import { useToast } from "vue-toastification";
@@ -120,8 +120,6 @@ const onSubmit = handleSubmit(async (data, actions) => {
   toast.success(results.message);
   return;
 });
-
-// Pa$$w0rd!
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { loginUser } from "@/api/api";
+import { loginUser } from "@/api/authApi";
 import { useForm, useField } from "vee-validate";
 import { RouterLink } from "vue-router";
 import { VueSpinnerBars } from "vue3-spinners";
