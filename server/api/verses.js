@@ -12,7 +12,7 @@ router
     try {
       const allVerses = await Verses.findOne(
         { userId: req.info.userId },
-        "verses globalVersion mode verseId"
+        "verseId verses globalVersion mode"
       );
       if (!allVerses) {
         return res.status(200).json({ success: true, verses: {} });
@@ -65,7 +65,10 @@ router
 
       const updatedVerses = await Verses.findOneAndUpdate(
         { userId: req.info.userId },
-        { verses: allVerses },
+        {
+          verses: allVerses,
+          mode: Object.keys(allVerses).length >= 30 ? "Mature" : "Newbie",
+        },
         { new: true }
       );
 
@@ -73,6 +76,7 @@ router
         success: true,
         message: "Verses Saved!",
         verses: updatedVerses.verses,
+        mode: updatedVerses.mode,
       });
     } catch (error) {
       console.error("Verse Post: ", error);
@@ -88,13 +92,10 @@ router
         { verses: {} },
         { new: true }
       );
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Deleted Verses Successfully!",
-          verses: deletedVerses.verses,
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Deleted Verses Successfully!",
+      });
     } catch (error) {
       console.error("DELETE VERSES", error);
       return res
@@ -102,5 +103,147 @@ router
         .status(500);
     }
   });
+
+router
+  .route("/verse-sec")
+  .get(validateToken, async (req, res) => {
+    try {
+      const verseSec = await Verses.findOne(
+        { userId: req.info.userId },
+        "versePass verseVisibility verseAccess"
+      );
+      return res.status(200).json({
+        success: true,
+        versePass: verseSec.versePass,
+        verseVisibility: verseSec.verseVisibility,
+        verseAccess: verseSec.verseAccess,
+      });
+    } catch (error) {
+      console.error("Verse SEC: ", error);
+      return res
+        .json({ success: false, message: "Server Error... Try Again Later!" })
+        .status(500);
+    }
+  })
+  .post(validateToken, async (req, res) => {
+    try {
+      if (req.body.schema === "password") {
+        const versePass = await Verses.findOneAndUpdate(
+          { userId: req.info.userId },
+          { versePass: req.body.versePass },
+          { new: true }
+        );
+        return res.status(200).json({
+          success: true,
+          message: "Verse Password Changed",
+          versePass: versePass.versePass,
+        });
+      }
+      if (req.body.schema === "visibility") {
+        const versePass = await Verses.findOneAndUpdate(
+          { userId: req.info.userId },
+          { verseVisibility: req.body.verseVisibility },
+          { new: true }
+        );
+        return res.status(200).json({
+          success: true,
+          message: "Verse Visibility Changed",
+          versePass: versePass.verseVisibility,
+        });
+      }
+      await Verses.findOneAndUpdate(
+        { userId: req.info.userId },
+        { verseAccess: req.body.verseAccess },
+        { new: true }
+      );
+      if (req.body.schema === "addUser")
+        return res.status(200).json({
+          success: true,
+          message: "User Added",
+        });
+      if (req.body.schema === "removeUser")
+        return res.status(200).json({
+          success: true,
+          message: "User Removed",
+        });
+    } catch (error) {
+      console.error("Verse Sec Change: ", error);
+      return res
+        .json({ success: false, message: "Server Error... Try Again Later!" })
+        .status(500);
+    }
+  });
+
+router.post("/import-verses", validateToken, async (req, res) => {
+  try {
+    const getUser = await Verses.findOne({ userId: req.info.userId });
+    if (getUser.verseId === req.body.verseId)
+      return res
+        .json({ success: false, message: "Cannot Import From Yourself" })
+        .status(401);
+    const getUserEmail = await User.findById(req.info.userId, "email");
+    const getVerses = await Verses.findOne({ verseId: req.body.verseId });
+    if (!getVerses)
+      return res
+        .json({ success: false, message: "Verse ID Not Found!" })
+        .status(404);
+    if (req.body.schema === "verseId") {
+      // if (getVerses.mode === "Newbie")
+      //   return res.json({
+      //     success: false,
+      //     message: "Unable To Import From This ID",
+      //   });
+      if (getVerses.verseVisibility === "public") {
+        if (getVerses.versePass.length > 0)
+          return res.status(200).json({ success: true, pass: true });
+        else
+          return res
+            .status(200)
+            .json({ success: true, verses: getVerses.verses });
+      }
+      if (getVerses.verseVisibility === "private") {
+        if (getVerses.verseAccess.indexOf(getUserEmail.email) >= 0)
+          return res
+            .status(200)
+            .json({ success: true, verses: getVerses.verses });
+        else
+          return res
+            .json({
+              success: false,
+              message:
+                "Ask User To Change Verse Visibility To Public Or Ask To Be Added To Their Access List",
+            })
+            .status(403);
+      }
+    }
+    if (req.body.schema === "versePass") {
+      if (getVerses.versePass === req.body.versePass)
+        return res
+          .status(200)
+          .json({ success: true, verses: getVerses.verses });
+      else
+        return res
+          .json({ success: false, message: "Verse ID or Password Incorrect!" })
+          .status(403);
+    }
+    if (req.body.schema === "submit") {
+      const verses = await Verses.findOneAndUpdate(
+        { userId: req.info.userId },
+        { verses: req.body.verses },
+        { new: true }
+      );
+      return res.status(200).json({
+        success: true,
+        message: "Imported Successfully!",
+        verses: verses.verses,
+      });
+    }
+  } catch (error) {
+    console.error("Verse Import: ", error);
+    return res
+      .json({ success: false, message: "Server Error... Try Again Later!" })
+      .status(500);
+  }
+});
 
 export default router;

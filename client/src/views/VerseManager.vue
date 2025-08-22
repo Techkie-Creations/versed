@@ -1,15 +1,27 @@
 <script setup lang="ts">
 import NavBar from "@/components/NavBar.vue";
 import { bibleVersions } from "@/utils/Types";
-import { hollowButton, solidButton } from "@/utils/exports";
+import {
+  checkVerses,
+  fitVerseIn,
+  hollowButton,
+  solidButton,
+} from "@/utils/exports";
 import { onMounted, ref } from "vue";
 import ConfirmPopup from "@/components/ConfirmPopup.vue";
-import { deleteVerses, getVerses, saveVerses } from "@/api/api";
+import {
+  deleteVerses,
+  getVerses,
+  getVerseSec,
+  saveVerses,
+  updateVerseSec,
+} from "@/api/api";
 import AddVerse from "@/components/VerseManager/AddVerse.vue";
 import { useToast } from "vue-toastification";
 import { Popover } from "primevue";
 import ViewNew from "@/components/VerseManager/ViewNew.vue";
 import ViewOld from "@/components/VerseManager/ViewOld.vue";
+import { Button, InputGroupAddon, InputGroup } from "primevue";
 
 const toast = useToast();
 
@@ -18,7 +30,13 @@ const showModal = ref(false);
 const showRemoveModal = ref(false);
 const isLoading = ref(false);
 
-const errVerse = ref({ book: "", chapter: "", verse: "" });
+const errVerse = ref({
+  book: "",
+  chapter: "",
+  verse: "",
+  versePass: "",
+  email: "",
+});
 
 const track = ref(JSON.parse(localStorage.getItem("track") || "{}"));
 const verses = ref({});
@@ -31,12 +49,26 @@ const removedVerses = ref(
 const numOfVerses = ref(0);
 const numOfNewVerses = ref(Object.keys(trackNew.value).length);
 const numOfRemoved = ref(Object.keys(removedVerses.value).length);
+const numOfTrack = ref(Object.keys(track.value).length);
 
 const mode = ref("");
 const globalV = ref("");
 const verseId = ref("");
 const viewOrder = ref("new");
 const popOver = ref();
+
+const verseVisible = ref("private");
+const versePass = ref("");
+const viewPass = ref(false);
+const passModal = ref(false);
+const verseAccess = ref<string[]>([]);
+const verseDef = ref({
+  versePass: "",
+  verseAccess: [""],
+});
+const error = ref({ msg: "", key: "" });
+
+const email = ref("");
 
 const arrangeVerses = (schema: "track" | "new" | "sort", id: number) => {
   const versesKeys = Object.keys(verses.value);
@@ -88,18 +120,35 @@ onMounted(async () => {
     numOfVerses.value = Object.keys(verses.value).length;
   }
 
+  if (results.mode === "Newbie") {
+    const getSec = await getVerseSec();
+    //if (getSec.success) {
+    versePass.value = getSec.versePass;
+    verseVisible.value = getSec.verseVisibility || "private";
+    verseAccess.value = getSec.verseAccess;
+    verseDef.value.versePass = getSec.versePass;
+    //}
+  }
+
   const versesKey = Object.keys(verses.value);
   const removedKeys = Object.keys(removedVerses.value);
   const trackKeys = Object.keys(track.value);
 
   for (let i = 0; i < removedKeys.length; i++) {
-    if (
-      versesKey.indexOf(removedKeys[i]) >= 0 &&
-      removedVerses.value[removedKeys[i]]["Part"] === "track"
-    ) {
-      delete verses.value[removedKeys[i]];
-      numOfVerses.value--;
-      verses.value = arrangeVerses("track", i);
+    for (let j = 0; j < versesKey.length; j++) {
+      const removedId = removedVerses.value[removedKeys[i]];
+      const verseId = verses.value[versesKey[j]];
+      if (!verseId) continue;
+      if (
+        removedId["Book"] === verseId["Book"] &&
+        removedId["Chapter"] === verseId["Chapter"] &&
+        removedId["Verse"] === verseId["Verse"] &&
+        removedId["To"] === verseId["To"]
+      ) {
+        delete verses.value[versesKey[j]];
+        numOfVerses.value--;
+        verses.value = arrangeVerses("track", j);
+      }
     }
   }
   for (let i = 0; i < trackKeys.length; i++) {
@@ -127,8 +176,11 @@ const verseIdClick = () => {
 };
 
 const handleSave = async () => {
+  arrangeVerses("new", numOfVerses.value);
+  let allVerses = checkVerses(verses.value, trackNew.value);
+  allVerses = checkVerses(removedVerses.value, trackNew.value);
   const formdata = {
-    newVerses: trackNew.value,
+    newVerses: allVerses.data,
     verses: verses.value,
     track: JSON.parse(localStorage.getItem("track") || "{}"),
   };
@@ -139,7 +191,7 @@ const handleSave = async () => {
     numOfVerses.value = numOfVerses.value + numOfNewVerses.value;
     numOfRemoved.value = 0;
     numOfNewVerses.value = 0;
-    localStorage.clear();
+    localStorage.setItem("trackNew", "{}");
     toast.success(results.message);
     showModal.value = false;
     return;
@@ -151,6 +203,8 @@ const handleSave = async () => {
 
 const handleRemoval = (id: number, schema: "new" | "track") => {
   const removedKeys = Object.keys(removedVerses.value);
+
+  console.log(typeof id);
 
   if (schema === "track") {
     for (let i = 0; i < removedKeys.length; i++) {
@@ -169,6 +223,7 @@ const handleRemoval = (id: number, schema: "new" | "track") => {
     }
     removedVerses.value[removedKeys.length] = verses.value[id];
     removedVerses.value[removedKeys.length]["Part"] = "track";
+    removedVerses.value[removedKeys.length]["Id"] = id;
     delete verses.value[id];
     delete track.value[id];
     verses.value = arrangeVerses("track", id);
@@ -212,12 +267,19 @@ const handleUndo = () => {
   if (
     removedVerses.value[removedKeys[removedKeys.length - 1]]["Part"] === "track"
   ) {
-    verses.value[numOfVerses.value] =
-      removedVerses.value[removedKeys[removedKeys.length - 1]];
-    delete verses.value[numOfVerses.value]["Part"];
+    verses.value = fitVerseIn(
+      verses.value,
+      removedVerses.value[removedKeys[removedKeys.length - 1]],
+      parseInt(removedVerses.value[removedKeys[removedKeys.length - 1]]["Id"])
+    );
+    verses.value = arrangeVerses(
+      "track",
+      parseInt(removedVerses.value[removedKeys[removedKeys.length - 1]]["Id"])
+    );
     numOfVerses.value++;
-    trackNew.value = arrangeVerses("sort", 0);
-    localStorage.setItem("trackNew", JSON.stringify(trackNew.value));
+    delete removedVerses.value[removedKeys[removedKeys.length - 1]];
+    numOfRemoved.value--;
+    localStorage.setItem("removed", JSON.stringify(removedVerses.value));
   }
 
   if (
@@ -226,6 +288,7 @@ const handleUndo = () => {
     trackNew.value[numOfNewVerses.value + numOfVerses.value] =
       removedVerses.value[removedKeys[removedKeys.length - 1]];
     delete trackNew.value[numOfNewVerses.value + numOfVerses.value]["Part"];
+    delete removedVerses.value[removedKeys[removedKeys.length - 1]];
     numOfNewVerses.value++;
     localStorage.setItem("trackNew", JSON.stringify(trackNew.value));
   }
@@ -236,17 +299,27 @@ const handleUndo = () => {
 };
 
 const handleCancel = () => {
-  let count = 0;
-  while (count <= Object.keys(removedVerses.value).length) {
-    handleUndo();
-    count++;
+  const removedKeys = Object.keys(removedVerses.value);
+  for (let i = 0; i < removedKeys.length; i++) {
+    const removedId = removedVerses.value[removedKeys[i]];
+    if (removedId["Part"] === "track") {
+      verses.value = fitVerseIn(
+        verses.value,
+        removedId,
+        parseInt(removedId["Id"])
+      );
+      verses.value = arrangeVerses("track", parseInt(removedId["Id"]));
+    }
   }
   trackNew.value = {};
   removedVerses.value = {};
+  track.value = {};
 
   numOfNewVerses.value = 0;
   numOfRemoved.value = 0;
+  numOfTrack.value = 0;
 
+  localStorage.setItem("track", JSON.stringify(track.value));
   localStorage.setItem("trackNew", JSON.stringify(trackNew.value));
   localStorage.setItem("removed", JSON.stringify(removedVerses.value));
 };
@@ -254,17 +327,90 @@ const handleCancel = () => {
 const handleDelete = async () => {
   const results = await deleteVerses();
   if (results.success) {
-    verses.value = results.value;
+    verses.value = {};
     numOfNewVerses.value = 0;
     numOfRemoved.value = 0;
     numOfVerses.value = 0;
-    localStorage.clear();
+    trackNew.value = {};
+    localStorage.setItem("trackNew", "{}");
+    localStorage.setItem("removed", "{}");
     toast.success(results.message);
     showRemoveModal.value = false;
     return;
   }
   toast.error(results.message);
   showRemoveModal.value = false;
+  return;
+};
+
+const verseClick = () => {
+  if (
+    versePass.value === verseDef.value.versePass ||
+    versePass.value.trim() === ""
+  )
+    return;
+  if (
+    !/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/.test(versePass.value)
+  )
+    return (errVerse.value.versePass =
+      "Make pass more complex with 8+ characters");
+  errVerse.value.versePass = "";
+  return (passModal.value = true);
+};
+
+const changeVPass = async () => {
+  const results = await updateVerseSec({
+    schema: "password",
+    versePass: versePass.value,
+  });
+  if (results.success) {
+    versePass.value = results.versePass;
+    verseDef.value.versePass = results.versePass;
+    toast.success(results.message);
+    showModal.value = false;
+    return;
+  }
+  toast.error(results.message);
+  showModal.value = false;
+  return;
+};
+
+const changeVerseVisibility = async () => {
+  const results = await updateVerseSec({
+    schema: "visibility",
+    verseVisibility: verseVisible.value,
+  });
+  if (!results) toast.error(results.message);
+  return;
+};
+
+const addVerseUser = async () => {
+  if (email.value.length === 0)
+    return (errVerse.value.email = "Email required!");
+  if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/.test(email.value)) {
+    return (errVerse.value.email = "Invalid email");
+  }
+  if (verseAccess.value.indexOf(email.value) >= 0)
+    return (errVerse.value.email = "Already in the list!");
+
+  verseAccess.value.push(email.value);
+  errVerse.value.email = "";
+  email.value = "";
+  const results = await updateVerseSec({
+    schema: "addUser",
+    verseAccess: verseAccess.value,
+  });
+  if (!results.success) toast.error(results.message);
+  return;
+};
+
+const removeVerseUser = async (userMail: string) => {
+  verseAccess.value.splice(verseAccess.value.indexOf(userMail), 1);
+  const results = await updateVerseSec({
+    schema: "removeUser",
+    verseAccess: verseAccess.value,
+  });
+  if (!results.success) toast.error(results.message);
   return;
 };
 </script>
@@ -303,6 +449,9 @@ const handleDelete = async () => {
       </div>
     </div>
     <section id="verse-cud" class="w-[40rem]">
+      <p class="text-baseRed text-center">
+        NOTE: The design and features change based on mode!
+      </p>
       <AddVerse
         v-model:verses="verses"
         v-model:track-new="trackNew"
@@ -335,7 +484,7 @@ const handleDelete = async () => {
         </Popover>
         <div
           class="flex gap-4 items-center"
-          v-if="numOfNewVerses > 0 || numOfRemoved > 0"
+          v-if="numOfNewVerses > 0 || numOfRemoved > 0 || numOfTrack > 0"
         >
           <button
             type="button"
@@ -369,27 +518,29 @@ const handleDelete = async () => {
           @success-click="handleDelete"
         />
       </div>
+      <p
+        v-if="numOfRemoved > 0"
+        class="text-alice hover:underline hover:cursor-pointer flex items-center w-[5rem] rounded-md border-1"
+        @click="handleUndo"
+      >
+        <i class="pi pi-undo p-2"></i> Undo
+      </p>
       <div
-        :class="`border-2 p-2 bg-alice rounded-md my-4 max-h-100 overflow-scroll overflow-x-auto w-full overflow-y-auto flex flex-col${
+        :class="`border-2 p-2 bg-alice rounded-md my-4 max-h-100 relative overflow-scroll overflow-x-auto w-full overflow-y-auto flex flex-col${
           viewOrder === 'new' ? '' : '-reverse'
         }`"
         v-if="numOfNewVerses > 0 || numOfRemoved > 0 || numOfVerses > 0"
       >
-        <p
-          v-if="numOfRemoved > 0"
-          class="text-eerie hover:underline hover:cursor-pointer flex items-center w-[4rem] justify-self-end"
-          @click="handleUndo"
-        >
-          <i class="pi pi-undo"></i> Undo
-        </p>
         <ViewNew
           v-model:num-of-new-verses="numOfNewVerses"
           v-model:err-verse="errVerse"
           v-model:track-new="trackNew"
+          v-model:error="error"
           @handle-remove="(e) => handleRemoval(e, 'new')"
         />
         <ViewOld
           v-model:num-of-verses="numOfVerses"
+          v-model:num-of-track="numOfTrack"
           v-model:err-verse="errVerse"
           v-model:verses="verses"
           @handle-remove="(e) => handleRemoval(e, 'track')"
@@ -401,6 +552,153 @@ const handleDelete = async () => {
         v-on:success-click="handleSave"
         dialog-text="Are you happy with the new verses added?"
       />
+    </section>
+    <section
+      class="w-[40rem] flex flex-col items-center justify-self-start gap-4 *:w-full mb-4"
+    >
+      <p class="border-t-2 border-b-2 mt-10 text-center text-[1.2rem]">
+        Verses Security
+      </p>
+      <div class="" v-if="mode === 'Newbie'">
+        <p class="font-bold flex items-center gap-2">
+          Verse Visibility:
+          <span class="text-gray-500">P{{ verseVisible.substring(1) }}</span>
+        </p>
+      </div>
+      <div class="" v-if="mode === 'Mature'">
+        <p class="font-bold flex items-center gap-2">
+          Verse Visibility:
+          <select
+            name="verseVisible"
+            id="verseVisible"
+            class="p-2 border-2 rounded-md bg-eerie text-alice"
+            v-model="verseVisible"
+            @change="changeVerseVisibility"
+          >
+            <option value="private">Private</option>
+            <option value="public">Public</option>
+          </select>
+        </p>
+        <p class="font-bold text-baseRed" v-if="verseVisible === 'public'">
+          Everyone can access your verse list unless there is a password
+        </p>
+        <p class="font-bold text-baseRed" v-else>
+          Only users in <i>Access List</i> can access your verse list
+        </p>
+      </div>
+      <div class="w-full" v-if="mode === 'Mature' && verseVisible === 'public'">
+        <label for="email" class="block mb-2"
+          ><i class="pi pi-lock text-baseRed mr-2"></i> Verse Password
+          <span class="text-baseRed">*</span> :</label
+        >
+        <div class="flex gap-2 w-full items-center">
+          <InputGroup>
+            <input
+              v-model="versePass"
+              :type="viewPass ? 'text' : 'password'"
+              name="password"
+              @input="errVerse.versePass = ''"
+              :class="`${
+                errVerse.versePass
+                  ? 'border-2 border-red-500 focus:outline-hidden'
+                  : 'border'
+              } rounded-l p-2 w-full`"
+              placeholder="**********"
+            />
+            <InputGroupAddon
+              :class="`${
+                errVerse.versePass
+                  ? 'border-2 border-red-500 bg-red-500 text-alice'
+                  : 'text-baseRed'
+              }`"
+            >
+              <Button
+                class="text-baseRed active:scale-y-75"
+                :icon="`pi pi-${viewPass ? 'eye-slash' : 'eye'}`"
+                variant="text"
+                @click="viewPass = !viewPass"
+              />
+            </InputGroupAddon>
+          </InputGroup>
+          <button
+            type="button"
+            :class="solidButton + ' w-1/3!'"
+            @click="verseClick"
+          >
+            Change Password
+          </button>
+        </div>
+        <span class="text-red-500 mt-2 block text-sm">{{
+          errVerse.versePass
+        }}</span>
+        <ConfirmPopup
+          success-icon="pi pi-check"
+          success-text="Change"
+          dialog-text="Are you sure you want to change password?"
+          v-model:show-modal="passModal"
+          header="Change Verse Password"
+          submit-text="Changing..."
+          @success-click="changeVPass"
+        />
+      </div>
+      <div
+        class="w-full mt-4"
+        v-if="mode === 'Mature' && verseVisible === 'private'"
+      >
+        <p class="text-xl">Access List</p>
+        <div class="my-4 w-full">
+          <label for="email" class="block mb-2"
+            ><i class="pi pi-envelope text-baseRed mr-2"></i> Enter User Email
+            <span class="text-baseRed">*</span> :</label
+          >
+          <div class="flex gap-2 items-center">
+            <input
+              v-model="email"
+              type="email"
+              name="email"
+              :class="`${
+                errVerse.email
+                  ? 'border-2 border-red-500 focus:outline-hidden'
+                  : 'border'
+              } rounded p-2 w-full`"
+              placeholder="john@doe.com"
+            />
+            <button
+              type="button"
+              :class="solidButton + ' w-1/3!'"
+              @click="addVerseUser"
+            >
+              <i class="pi pi-plus"></i>
+              Add User
+            </button>
+          </div>
+          <span class="text-red-500 mt-2 block text-sm">{{
+            errVerse.email
+          }}</span>
+        </div>
+
+        <p class="text-baseRed text-center" v-if="verseAccess.length === 0">
+          Access list empty!
+        </p>
+        <div
+          class="w-1/2 border-2 p-2 rounded-md overflow-y-auto overflow-x-hidden max-h-[20rem]"
+          v-if="verseAccess.length > 0"
+        >
+          <div
+            class="w-full flex items-center gap-2 justify-between my-2"
+            v-for="access in verseAccess"
+          >
+            <p>{{ access }}</p>
+            <button
+              type="button"
+              :class="solidButton + ' w-auto!'"
+              @click="() => removeVerseUser(access)"
+            >
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
     </section>
   </div>
 </template>

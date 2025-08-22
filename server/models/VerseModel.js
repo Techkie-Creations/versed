@@ -3,10 +3,12 @@ import mongoose from "mongoose";
 const VerseSchema = new mongoose.Schema({
   userId: {
     type: String,
+    unique: true,
     required: true,
   },
   verseId: {
     type: String,
+    unique: true,
     required: true,
   },
   verses: {
@@ -24,6 +26,14 @@ const VerseSchema = new mongoose.Schema({
   versePass: {
     type: String,
     default: "",
+  },
+  verseVisibility: {
+    type: String,
+    default: "Private",
+  },
+  verseAccess: {
+    type: [String],
+    default: [],
   },
 });
 

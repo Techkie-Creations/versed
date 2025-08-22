@@ -122,7 +122,7 @@ const errors = defineModel("errors", { type: Object });
           "
         >
           <option value="Chapter" disabled hidden>Chapter</option>
-          <option v-for="num in [...Array(100).keys()]" :value="num + 1">
+          <option v-for="num in [...Array(100).keys()]" :value="`${num + 1}`">
             {{ num + 1 }}
           </option>
         </select>
@@ -145,12 +145,12 @@ const errors = defineModel("errors", { type: Object });
           "
         >
           <option value="Verse" disabled hidden>Verse</option>
-          <option v-for="num in [...Array(100).keys()]" :value="num + 1">
+          <option v-for="num in [...Array(100).keys()]" :value="`${num + 1}`">
             {{ num + 1 }}
           </option>
         </select>
       </div>
-      <div class="flex flex-col justify-center w-1/3">
+      <div class="flex flex-col justify-center w-1/3" v-if="showToVerse">
         <label
           v-if="showSelectTitle"
           for="toVerse"
@@ -158,11 +158,10 @@ const errors = defineModel("errors", { type: Object });
           >To:</label
         >
         <select
-          v-if="showToVerse"
           v-model="toVerse"
           name="toVerse"
           id="toVerse"
-          :class="colors + ' rounded p-2 w-full bg-eerie border'"
+          :class="colors + ' rounded p-2 w-full bg-eerie border '"
         >
           <option value="To" disabled hidden>To</option>
           <option value="*">*</option>

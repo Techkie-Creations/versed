@@ -80,6 +80,7 @@ const linkObjects = {
 };
 
 const handleLogout = async () => {
+  localStorage.clear();
   const results = await logout();
   if (results.success) {
     toast.success(results.message);
@@ -94,7 +95,7 @@ const handleLogout = async () => {
 
 <template>
   <header
-    :class="`w-full px-8 py-4 flex justify-between items-center fixed border-b top-0 left-0 bg-eerie z-10`"
+    :class="`w-full px-8 py-4 flex justify-between items-center fixed border-b border-gray-500 top-0 left-0 bg-eerie z-10`"
   >
     <img
       src="@/assets/logo.svg"

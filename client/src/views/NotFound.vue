@@ -4,5 +4,5 @@ import NavBar from "@/components/NavBar.vue";
 
 <template>
   <NavBar />
-  <h1 class="text-7xl text-red-700">PAGE NOT FOUND!!</h1>
+  <h1 class="text-7xl text-red-700 ml-50 mt-100">PAGE NOT FOUND!!</h1>
 </template>

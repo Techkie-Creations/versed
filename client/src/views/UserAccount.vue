@@ -207,7 +207,7 @@ const deleteAccount = async () => {
       }}</span>
       <div class="mb-4 w-full" v-if="!pwdReset">
         <label for="email" class="block mb-2"
-          ><i class="pi pi-envelope text-baseRed mr-4"></i> Current Password
+          ><i class="pi pi-lock text-baseRed mr-4"></i> Current Password
           <span class="text-baseRed">*</span> :</label
         >
         <InputGroup>

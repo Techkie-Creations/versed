@@ -12,6 +12,14 @@ const props = defineProps({
     default: "check",
   },
   dialogText: String,
+  header: {
+    type: String,
+    default: "Save New Verses",
+  },
+  submitText: {
+    type: String,
+    default: "Saving...",
+  },
 });
 
 const successClick = defineEmits(["successClick"]);
@@ -24,7 +32,7 @@ const isLoading = defineModel("isLoading");
   <Dialog
     v-model:visible="showModal"
     modal
-    header="Save New Verses"
+    :header="header"
     class="w-[25rem] p-4 border-2 bg-alice"
   >
     <div class="w-full flex flex-col gap-2 mt-10">
@@ -47,7 +55,7 @@ const isLoading = defineModel("isLoading");
             >{{ props.successText }}</span
           >
           <span class="flex justify-center gap-2 items-center" v-if="isLoading"
-            ><i class="pi pi-spin pi-spinner"></i>Saving...</span
+            ><i class="pi pi-spin pi-spinner"></i>{{ submitText }}</span
           >
         </button>
       </div>

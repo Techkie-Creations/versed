@@ -1,3 +1,6 @@
+import Socials from "../models/SocialModel.js";
+import Verses from "../models/VerseModel.js";
+
 const assign = {
   A: "13",
   B: "12",
@@ -90,7 +93,32 @@ export const checkDate = (changeDate, daysElapsed) => {
   return [true, null];
 };
 
+/**
+ * Creates the verse ID
+ * @param {*} userId String value of the userId
+ * @returns Verse ID
+ */
 export const verseId = (userId) => {
   const id = userId.substring(0, 7) + "-versed-" + userId.substring(14, 21);
   return id;
+};
+
+export const registerUser = async (id, misc = {}) => {
+  console.log(id);
+  try {
+    const verses = new Verses({
+      userId: id,
+      verseId: verseId(id),
+      globalVersion: misc.gbv,
+      mode: "Newbie",
+    });
+    const socials = new Socials({
+      userId: id,
+    });
+    await verses.save(), socials.save();
+    return true;
+  } catch (error) {
+    console.error("Reg User: ", error);
+    return false;
+  }
 };
