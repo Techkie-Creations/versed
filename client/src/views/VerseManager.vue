@@ -14,6 +14,7 @@ import {
   getVerses,
   getVerseSec,
   saveVerses,
+  updateVerseMisc,
   updateVerseSec,
 } from "@/api/versesApi";
 import AddVerse from "@/components/VerseManager/AddVerse.vue";
@@ -167,6 +168,16 @@ onMounted(async () => {
 
 const toggle = (e: Event) => {
   popOver.value.toggle(e);
+};
+
+const versionChange = async () => {
+  const results = await updateVerseMisc({
+    schema: "globalV",
+    globalV: globalV.value,
+  });
+  results.success
+    ? toast.success(results.message)
+    : toast.error(results.message);
 };
 
 const verseIdClick = () => {
@@ -359,7 +370,7 @@ const verseClick = () => {
 };
 
 const changeVPass = async () => {
-  const results = await updateVerseSec({
+  const results = await updateVerseMisc({
     schema: "password",
     versePass: versePass.value,
   });
@@ -376,7 +387,7 @@ const changeVPass = async () => {
 };
 
 const changeVerseVisibility = async () => {
-  const results = await updateVerseSec({
+  const results = await updateVerseMisc({
     schema: "visibility",
     verseVisibility: verseVisible.value,
   });
@@ -441,6 +452,7 @@ const removeVerseUser = async (userMail: string) => {
           id="global-version"
           class="rounded p-2 border w-auto bg-eerie"
           v-model="globalV"
+          @change="versionChange"
         >
           <option v-for="version in bibleVersions" :value="version">
             {{ version }}

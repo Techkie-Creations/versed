@@ -87,7 +87,7 @@ router
   })
   .delete(validateToken, async (req, res) => {
     try {
-      const deletedVerses = await Verses.findOneAndUpdate(
+      await Verses.findOneAndUpdate(
         { userId: req.info.userId },
         { verses: {} },
         { new: true }
@@ -127,30 +127,6 @@ router
   })
   .post(validateToken, async (req, res) => {
     try {
-      if (req.body.schema === "password") {
-        const versePass = await Verses.findOneAndUpdate(
-          { userId: req.info.userId },
-          { versePass: req.body.versePass },
-          { new: true }
-        );
-        return res.status(200).json({
-          success: true,
-          message: "Verse Password Changed",
-          versePass: versePass.versePass,
-        });
-      }
-      if (req.body.schema === "visibility") {
-        const versePass = await Verses.findOneAndUpdate(
-          { userId: req.info.userId },
-          { verseVisibility: req.body.verseVisibility },
-          { new: true }
-        );
-        return res.status(200).json({
-          success: true,
-          message: "Verse Visibility Changed",
-          versePass: versePass.verseVisibility,
-        });
-      }
       await Verses.findOneAndUpdate(
         { userId: req.info.userId },
         { verseAccess: req.body.verseAccess },
@@ -238,6 +214,52 @@ router.post("/import-verses", validateToken, async (req, res) => {
     return res
       .json({ success: false, message: "Server Error... Try Again Later!" })
       .status(500);
+  }
+});
+
+router.post("/verses-misc", validateToken, async (req, res) => {
+  try {
+    if (req.body.schema === "password") {
+      const versePass = await Verses.findOneAndUpdate(
+        { userId: req.info.userId },
+        { versePass: req.body.versePass },
+        { new: true }
+      );
+      return res.status(200).json({
+        success: true,
+        message: "Verse Password Changed",
+        versePass: versePass.versePass,
+      });
+    }
+    if (req.body.schema === "visibility") {
+      const versePass = await Verses.findOneAndUpdate(
+        { userId: req.info.userId },
+        { verseVisibility: req.body.verseVisibility },
+        { new: true }
+      );
+      return res.status(200).json({
+        success: true,
+        message: "Verse Visibility Changed",
+        versePass: versePass.verseVisibility,
+      });
+    }
+    if (req.body.schema === "globalV") {
+      const globalV = await Verses.findOneAndUpdate(
+        { userId: req.info.userId },
+        { globalVersion: req.body.globalV },
+        { new: true }
+      );
+      return res
+        .status(200)
+        .json({
+          success: true,
+          message: "Global Version Changed",
+          globalV: globalV.globalVersion,
+        });
+    }
+  } catch (error) {
+    console.error("Verses Misc: ", error);
+    return res.json({ success: false, message: "Server Error... Try Again!" });
   }
 });
 

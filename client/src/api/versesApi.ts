@@ -51,3 +51,12 @@ export const versesImport = async (formData: Object) => {
     .catch((err) => err.response);
   return results;
 };
+
+// Verses Misc
+export const updateVerseMisc = async (formData: Object) => {
+  const results = await api
+    .post("/verses/verses-misc", formData, { withCredentials: true })
+    .then((res) => res.data)
+    .catch((err) => err.response);
+  return results;
+};
