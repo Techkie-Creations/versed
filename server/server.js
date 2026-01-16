@@ -5,6 +5,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRouter from "./api/auth.js";
 import accountRouter from "./api/useraccount.js";
+import verseRouter from "./api/verses.js";
 import { connectDB } from "./config/dbconfig.js";
 import { validateToken } from "./middleware/validateToken.js";
 import User from "./models/UserModel.js";
@@ -29,6 +30,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", accountRouter);
+app.use("/api/verses", verseRouter);
 
 app.get("/api/checkUser", validateToken, async (req, res) => {
   try {
@@ -58,5 +60,3 @@ app.listen(PORT, () => {
   connectDB();
   console.log(`Server started on http://localhost:${PORT}`);
 });
-
-// John@jon.com Kryptonium@7

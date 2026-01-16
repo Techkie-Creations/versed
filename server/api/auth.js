@@ -4,10 +4,16 @@ import { upload } from "../middleware/multer.js";
 import { v2 as cloudinary } from "cloudinary";
 import { validation } from "../helper/validation.js";
 import User from "../models/UserModel.js";
-import { codeGenerator, fullName, verseEncoder } from "../helper/misc.js";
+import {
+  codeGenerator,
+  fullName,
+  registerUser,
+  verseEncoder,
+} from "../helper/misc.js";
 import { generateAccessToken, generateRefreshToken } from "../helper/tokens.js";
 import dotenv from "dotenv";
 import { uploadImage } from "../cloudinary.js";
+import Verses from "../models/VerseModel.js";
 
 dotenv.config();
 
@@ -79,6 +85,15 @@ router.post("/register", upload.single("avatar"), async (req, res) => {
 
   try {
     await newUser.save();
+
+    const regUser = await registerUser(newUser._id.toString(), {
+      gbv: version,
+    });
+    if (!regUser)
+      return res.json({
+        success: false,
+        message: "Server Error... Try Again Later",
+      });
 
     const refreshToken = generateRefreshToken(newUser._id);
 

@@ -7,13 +7,13 @@ import VerseSelector from "@/components/VerseSelector.vue";
 import PasswordReset from "@/components/PasswordReset.vue";
 import { InputGroup, InputGroupAddon, Button } from "primevue";
 import Socials from "@/components/UserAccount/Socials.vue";
-import { solidButton } from "@/utils/Types";
+import { solidButton } from "@/utils/exports";
 import {
   changePassword,
   deleteUserAccount,
   getSecVerse,
   updateSecVerse,
-} from "@/api/api";
+} from "@/api/useraccApi";
 import { useToast } from "vue-toastification";
 import Dialog from "primevue/dialog";
 import router from "@/router";
@@ -207,7 +207,7 @@ const deleteAccount = async () => {
       }}</span>
       <div class="mb-4 w-full" v-if="!pwdReset">
         <label for="email" class="block mb-2"
-          ><i class="pi pi-envelope text-baseRed mr-4"></i> Current Password
+          ><i class="pi pi-lock text-baseRed mr-4"></i> Current Password
           <span class="text-baseRed">*</span> :</label
         >
         <InputGroup>

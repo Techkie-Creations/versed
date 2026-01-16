@@ -23,7 +23,7 @@ export const deleteImage = async (publicId) => {
     await cloudinary.uploader.destroy(publicId);
     return true;
   } catch (error) {
-    console.log("IMAGE DESTROY", error);
+    console.error("IMAGE DESTROY", error);
     return false;
   }
 };

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { loginUser } from "@/api/api";
+import { loginUser } from "@/api/authApi";
 import { useForm, useField } from "vee-validate";
 import { RouterLink } from "vue-router";
 import { VueSpinnerBars } from "vue3-spinners";
@@ -99,7 +99,7 @@ const onSubmit = handleSubmit(async (data) => {
 
     <RouterLink
       to="/auth/forgotPassword"
-      class="text-baseRed block mb-4 hover:text-alice hover:underline"
+      class="text-baseRed block mb-4 hover:text-alice hover:underline w-30"
       >Forgot Password?</RouterLink
     >
     <button

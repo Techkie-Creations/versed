@@ -38,10 +38,6 @@ const handleFileChange = async (e) => {
     if (fileUrl && fileName) {
       if (file instanceof HTMLInputElement) {
         file.files = await fileObject({ fileUrl, fileName, fileType }, false);
-        // console.log(
-        //   "OBJ",
-        //   await fileObject({ fileUrl, fileName, fileType }, false)
-        // );
       }
     }
   }

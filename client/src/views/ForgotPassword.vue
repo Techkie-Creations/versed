@@ -5,7 +5,7 @@ import VerseSelector from "@/components/VerseSelector.vue";
 import { VueSpinnerBars } from "vue3-spinners";
 import { ref } from "vue";
 import { ForgotPasswordSchema } from "@/utils/ValidationSchemas";
-import { forgotPassword } from "@/api/api";
+import { forgotPassword } from "@/api/authApi";
 import { useToast } from "vue-toastification";
 import PasswordReset from "@/components/PasswordReset.vue";
 import NavBar from "@/components/NavBar.vue";

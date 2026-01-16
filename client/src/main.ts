@@ -29,6 +29,7 @@ app.use(Toast, {
   transition: "Vue-Toastification__bounce",
   maxToasts: 2,
   newestOnTop: true,
+  timeout: 1500,
 });
 
 app.mount("#app");

@@ -1,17 +1,36 @@
-import { checkAuth } from "@/api/api";
+import { checkAuth } from "@/api/base";
+import router from "@/router";
 
 export const Authenticated = async (toRoute: string = "") => {
   const afterAuth = [
-    "/auth/login",
-    "/",
-    "/auth/forgotPassword",
-    "/auth/signup",
+    ...router
+      .getRoutes()
+      .filter((item) => item.meta.name === "before")
+      .map((item) => item.path),
+    "/:catchAll(.*)*",
   ];
-  const beforeAuth = ["/dashboard", "/user/my-account"];
+  const beforeAuth = [
+    ...router
+      .getRoutes()
+      .filter((item) => item.meta.name === "after")
+      .map((item) => item.path),
+    "/:catchAll(.*)*",
+  ];
   const results = await checkAuth();
 
-  if (results.success && afterAuth.indexOf(toRoute) >= 0) return "/dashboard";
-  else if (!results.success && beforeAuth.indexOf(toRoute) >= 0)
+  if (afterAuth.indexOf(toRoute) === -1 && beforeAuth.indexOf(toRoute) === -1)
+    return "notfound";
+  if (
+    results.success &&
+    afterAuth.indexOf(toRoute) >= 0 &&
+    toRoute !== "/:catchAll(.*)*"
+  )
+    return "/user/my-account";
+  else if (
+    !results.success &&
+    beforeAuth.indexOf(toRoute) >= 0 &&
+    toRoute !== "/:catchAll(.*)*"
+  )
     return "/auth/login";
   else return toRoute;
 };

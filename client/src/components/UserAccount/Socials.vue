@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { getUserSocials, updateUserSocials } from "@/api/api";
-import { inputFocus, solidButton } from "@/utils/Types";
+import { getUserSocials, updateUserSocials } from "@/api/useraccApi";
+import { inputFocus, solidButton } from "@/utils/exports";
 import { InputGroupAddon, InputGroup } from "primevue";
 import { onMounted, ref } from "vue";
 import { useToast } from "vue-toastification";

@@ -3,7 +3,7 @@ import { useField, useForm } from "vee-validate";
 import { imageObject } from "@/utils/Types";
 import { fileObject, defaultAvatar } from "@/utils/FileObject";
 import { onMounted, ref } from "vue";
-import { registerUser } from "@/api/api";
+import { registerUser } from "@/api/authApi";
 import { VueSpinnerBars } from "vue3-spinners";
 import { useToast } from "vue-toastification";
 import { RegistrationSchema } from "@/utils/ValidationSchemas";
@@ -61,12 +61,7 @@ const onSubmit = handleSubmit(async (data, action) => {
       verse: verse.value === "Verse" ? "Required" : "",
     });
 
-  console.log(data);
-
   const fileReturn = await fileObject(imageObject[0]);
-  console.log("FILE RETURN", fileReturn[0]);
-
-  console.log(data.avatar[0], "NEW");
 
   formData.append(
     "avatar",
