@@ -7,7 +7,7 @@ export const Authenticated = async (toRoute: string = "") => {
     "/auth/forgotPassword",
     "/auth/signup",
   ];
-  const beforeAuth = ["/dashboard", "/my-account"];
+  const beforeAuth = ["/dashboard", "/user/my-account"];
   const results = await checkAuth();
 
   if (results.success && afterAuth.indexOf(toRoute) >= 0) return "/dashboard";

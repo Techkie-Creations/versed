@@ -110,9 +110,7 @@ const onSubmit = handleSubmit(async (data) => {
       <span v-if="isSubmitting" class="flex gap-4 items-center justify-center"
         >Submitting...<VueSpinnerBars size="30" class="text-baseRed"
       /></span>
-      <span v-else
-        ><i class="pi pi-user-plus text-baseRed mr-4"></i>Log In</span
-      >
+      <span v-else><i class="pi pi-sign-in text-baseRed mr-4"></i>Log In</span>
     </button>
   </form>
   <hr class="bg-alice mt-4 w-2/4 m-auto" />

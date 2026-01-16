@@ -71,3 +71,44 @@ export const codeGenerator = (num) => {
   }
   return code;
 };
+
+/**
+ * Used to check if the days elapsed between change date and current date is sufficient for change
+ * @param {*} changeDate Date when the change was made
+ * @param {*} daysElapsed How many days must have elapsed before change is possible
+ * @returns [boolean, daysElapsed - changeDate || null]
+ */
+export const checkDate = (changeDate, daysElapsed) => {
+  if (!changeDate) return [true, null];
+  const daysLeft = Math.floor(
+    Math.abs(new Date() - new Date(changeDate)) / (1000 * 60 * 60 * 24)
+  );
+  const today = new Date().toLocaleDateString();
+
+  if (daysLeft < daysElapsed || today === existingUser.passwordChanged)
+    return [false, daysElapsed - daysLeft];
+  return [true, null];
+};
+
+// import axios from "axios";
+// import fs from "fs";
+// export const getCountries = async () => {
+//   let obj = [];
+//   const countries = await axios
+//     .get("https://www.apicountries.com/countries")
+//     .then((res) => res.data)
+//     .catch((err) => err.response.data);
+//   for (let i = 0; i < countries.length; i++) {
+//     const bracket = countries[i]["name"].indexOf("(");
+//     console.log(bracket);
+//     if (bracket >= 0) {
+//       obj.push({
+//         name: countries[i]["name"].slice(0, bracket),
+//         flag: countries[i]["flag"],
+//       });
+//     }
+//     obj.push({ name: countries[i]["name"], flag: countries[i]["flag"] });
+//   }
+// };
+
+// getCountries();

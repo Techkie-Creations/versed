@@ -7,10 +7,9 @@ import jwt from "jsonwebtoken";
  */
 export const generateAccessToken = (userId) => {
   const accessToken = jwt.sign({ id: userId }, process.env.JWT_ACCESS_SECRET, {
-    expiresIn: "2m",
+    expiresIn: "3h",
     issuer: `http://localhost:${process.env.PORT || 5000}`,
   });
-  console.log(accessToken, "ACCESS TOKEN");
   return accessToken;
 };
 
@@ -24,11 +23,10 @@ export const generateRefreshToken = (userId) => {
     { id: userId },
     process.env.JWT_REFRESH_SECRET,
     {
-      expiresIn: "3m",
+      expiresIn: "3h",
       issuer: `http://localhost:${process.env.PORT || 5000}`,
     }
   );
-  console.log(refreshToken, "REFRESH TOKEN");
   return refreshToken;
 };
 
