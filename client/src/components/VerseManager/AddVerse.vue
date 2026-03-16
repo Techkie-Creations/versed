@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { hollowButton, solidButton } from "@/utils/exports";
 import { onMounted, ref } from "vue";
-import VerseSelector from "../VerseSelector.vue";
+import VerseSelector from "../Misc/VerseSelector.vue";
 import { getVerses } from "@/api/versesApi";
 import ImportVerses from "./ImportVerses.vue";
 
@@ -9,6 +9,7 @@ const verses = defineModel("verses", { type: Object });
 const trackNew = defineModel("trackNew", { type: Object });
 const numOfVerses = defineModel("numOfVerses", { default: 0 });
 const numOfNewVerses = defineModel("numOfNewVerses", { default: 0 });
+const mode = defineModel("mode", { type: String });
 
 const showModal = ref(false);
 
@@ -167,5 +168,6 @@ const addVerse = (key: number) => {
     :num-of-verses="numOfVerses"
     v-model:track-new="trackNew"
     v-model:verses="verses"
+    v-if="mode === 'Mature'"
   />
 </template>

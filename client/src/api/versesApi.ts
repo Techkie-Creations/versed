@@ -10,6 +10,7 @@ export const getVerses = async () => {
   return results;
 };
 
+// Save Verses
 export const saveVerses = async (formData: Object) => {
   const results = await api
     .post("/verses/my-verses", formData, { withCredentials: true })
@@ -18,6 +19,7 @@ export const saveVerses = async (formData: Object) => {
   return results;
 };
 
+// Delete Verses
 export const deleteVerses = async () => {
   const results = await api
     .delete("/verses/my-verses", { withCredentials: true })
@@ -35,6 +37,7 @@ export const getVerseSec = async () => {
   return results;
 };
 
+// Update Verse Security
 export const updateVerseSec = async (formData: Object) => {
   const results = await api
     .post("/verses/verse-sec", formData, { withCredentials: true })

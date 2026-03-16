@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { verseChange } from "@/utils/exports";
 import { hollowButton } from "@/utils/exports";
-import VerseSelector from "../VerseSelector.vue";
+import VerseSelector from "../Misc/VerseSelector.vue";
+import { verseChange } from "@/exports/VersesExports";
 
 const numOfVerses = defineModel("numOfVerses", { default: 0 });
 const numOfTrack = defineModel("numOfTrack", { default: 0 });
@@ -21,18 +21,39 @@ const handleRemove = defineEmits(["handleRemove"]);
       <VerseSelector
         :version="verses[key].Version"
         @update:version="
-                (text: string) => {verseChange(i, text, 'Version', 'track'); numOfTrack++}
-              "
+          (text: string) => {
+            verseChange(i, text, 'Version', 'track');
+            numOfTrack++;
+          }
+        "
         :book="verses[key].Book"
-        @update:book="(text: string) => {verseChange(i, text, 'Book', 'track'); numOfTrack++}"
+        @update:book="
+          (text: string) => {
+            verseChange(i, text, 'Book', 'track');
+            numOfTrack++;
+          }
+        "
         :chapter="verses[key].Chapter"
         @update:chapter="
-                (text: string) => {verseChange(i, text, 'Chapter', 'track'); numOfTrack++}
-              "
+          (text: string) => {
+            verseChange(i, text, 'Chapter', 'track');
+            numOfTrack++;
+          }
+        "
         :verse="verses[key].Verse"
-        @update:verse="(text: string) => {verseChange(i, text, 'Verse', 'track'); numOfTrack++}"
+        @update:verse="
+          (text: string) => {
+            verseChange(i, text, 'Verse', 'track');
+            numOfTrack++;
+          }
+        "
         :to-verse="verses[key].To"
-        @update:to-verse="(text: string) => {verseChange(i, text, 'To', 'track'); numOfTrack++}"
+        @update:to-verse="
+          (text: string) => {
+            verseChange(i, text, 'To', 'track');
+            numOfTrack++;
+          }
+        "
         v-model:errors="errVerse"
         :show-version="true"
         :show-to-verse="true"

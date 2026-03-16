@@ -8,7 +8,7 @@ import { ref } from "vue";
 import { LoginSchema } from "@/utils/ValidationSchemas";
 import { useToast } from "vue-toastification";
 import router from "@/router";
-import NavBar from "@/components/NavBar.vue";
+import NavBar from "@/components//Misc/NavBar.vue";
 
 const { handleSubmit, errors, isSubmitting, resetField } = useForm({
   validationSchema: LoginSchema,

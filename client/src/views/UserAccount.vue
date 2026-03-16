@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import NavBar from "@/components/NavBar.vue";
+import NavBar from "@/components/Misc/NavBar.vue";
 import Profile from "@/components/UserAccount/Profile.vue";
 import { useField } from "vee-validate";
 import { onMounted, ref } from "vue";
-import VerseSelector from "@/components/VerseSelector.vue";
-import PasswordReset from "@/components/PasswordReset.vue";
+import VerseSelector from "@/components/Misc/VerseSelector.vue";
+import PasswordReset from "@/components/Misc/PasswordReset.vue";
 import { InputGroup, InputGroupAddon, Button } from "primevue";
 import Socials from "@/components/UserAccount/Socials.vue";
 import { solidButton } from "@/utils/exports";

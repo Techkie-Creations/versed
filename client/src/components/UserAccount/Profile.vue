@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import Avatar from "../Avatar.vue";
+import Avatar from "../Misc/Avatar.vue";
 import { defaultAvatar, fileObject } from "@/utils/FileObject";
 import { useField, useForm } from "vee-validate";
 import { DatePicker } from "primevue";
@@ -108,7 +108,7 @@ const onSubmit = handleSubmit(async (data, actions) => {
   formData.append("schema", "personal");
   formData.append(
     "defaultAvatar",
-    file.value === defaultData.value.avatar ? "true" : "false"
+    file.value === defaultData.value.avatar ? "true" : "false",
   );
   formData.append("avatarUrl", file.value);
   const results = await updateUserProfile(formData, "personal");

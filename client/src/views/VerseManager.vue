@@ -1,14 +1,9 @@
 <script setup lang="ts">
-import NavBar from "@/components/NavBar.vue";
+import NavBar from "@/components/Misc/NavBar.vue";
 import { bibleVersions } from "@/utils/Types";
-import {
-  checkVerses,
-  fitVerseIn,
-  hollowButton,
-  solidButton,
-} from "@/utils/exports";
+import { hollowButton, solidButton } from "@/utils/exports";
 import { onMounted, ref } from "vue";
-import ConfirmPopup from "@/components/ConfirmPopup.vue";
+import ConfirmPopup from "@/components/Misc/ConfirmPopup.vue";
 import {
   deleteVerses,
   getVerses,
@@ -23,6 +18,7 @@ import { Popover } from "primevue";
 import ViewNew from "@/components/VerseManager/ViewNew.vue";
 import ViewOld from "@/components/VerseManager/ViewOld.vue";
 import { Button, InputGroupAddon, InputGroup } from "primevue";
+import { checkVerses, fitVerseIn } from "@/exports/VersesExports";
 
 const toast = useToast();
 
@@ -42,10 +38,10 @@ const errVerse = ref({
 const track = ref(JSON.parse(localStorage.getItem("track") || "{}"));
 const verses = ref({});
 const trackNew = ref(
-  JSON.parse(localStorage.getItem("trackNew") || "{}") || {}
+  JSON.parse(localStorage.getItem("trackNew") || "{}") || {},
 );
 const removedVerses = ref(
-  JSON.parse(localStorage.getItem("removed") || "{}") || {}
+  JSON.parse(localStorage.getItem("removed") || "{}") || {},
 );
 const numOfVerses = ref(0);
 const numOfNewVerses = ref(Object.keys(trackNew.value).length);
@@ -114,6 +110,7 @@ const arrangeVerses = (schema: "track" | "new" | "sort", id: number) => {
 onMounted(async () => {
   const results = await getVerses();
   if (results.success) {
+    console.log(results, "VERSES");
     mode.value = results.mode || "Newbie";
     globalV.value = results.globalV;
     verseId.value = results.verseId;
@@ -281,11 +278,11 @@ const handleUndo = () => {
     verses.value = fitVerseIn(
       verses.value,
       removedVerses.value[removedKeys[removedKeys.length - 1]],
-      parseInt(removedVerses.value[removedKeys[removedKeys.length - 1]]["Id"])
+      parseInt(removedVerses.value[removedKeys[removedKeys.length - 1]]["Id"]),
     );
     verses.value = arrangeVerses(
       "track",
-      parseInt(removedVerses.value[removedKeys[removedKeys.length - 1]]["Id"])
+      parseInt(removedVerses.value[removedKeys[removedKeys.length - 1]]["Id"]),
     );
     numOfVerses.value++;
     delete removedVerses.value[removedKeys[removedKeys.length - 1]];
@@ -317,7 +314,7 @@ const handleCancel = () => {
       verses.value = fitVerseIn(
         verses.value,
         removedId,
-        parseInt(removedId["Id"])
+        parseInt(removedId["Id"]),
       );
       verses.value = arrangeVerses("track", parseInt(removedId["Id"]));
     }
@@ -387,6 +384,7 @@ const changeVPass = async () => {
 };
 
 const changeVerseVisibility = async () => {
+  console.log(verseVisible.value);
   const results = await updateVerseMisc({
     schema: "visibility",
     verseVisibility: verseVisible.value,

@@ -13,6 +13,10 @@ export const defaultFileObj: ImageURL = {
   fileType: "image/jpg",
 };
 
+export type verseType = {
+  version: string;
+};
+
 // BIBLICAL ZONE
 export const bibleVersions = [
   "NKJV",

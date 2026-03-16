@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { verseChange } from "@/utils/exports";
 import { hollowButton } from "@/utils/exports";
-import VerseSelector from "../VerseSelector.vue";
+import VerseSelector from "../Misc/VerseSelector.vue";
+import { verseChange } from "@/exports/VersesExports";
 
 const numOfNewVerses = defineModel("numOfNewVerses", { default: 0 });
 const errVerse = defineModel("errVerse");
@@ -20,22 +20,24 @@ const handleRemove = defineEmits(["handleRemove"]);
         <VerseSelector
           :version="trackNew[parseInt(key)]['Version']"
           @update:version="
-          (text: string) => verseChange(parseInt(key), text, 'Version', 'new')
-        "
+            (text: string) => verseChange(parseInt(key), text, 'Version', 'new')
+          "
           :book="trackNew[parseInt(key)]['Book']"
-          @update:book="(text: string) => verseChange(parseInt(key), text, 'Book', 'new') "
+          @update:book="
+            (text: string) => verseChange(parseInt(key), text, 'Book', 'new')
+          "
           :chapter="trackNew[parseInt(key)]['Chapter']"
           @update:chapter="
-          (text: string) => verseChange(parseInt(key), text, 'Chapter', 'new') 
-        "
+            (text: string) => verseChange(parseInt(key), text, 'Chapter', 'new')
+          "
           :verse="trackNew[parseInt(key)]['Verse']"
           @update:verse="
-          (text: string) => verseChange(parseInt(key), text, 'Verse', 'new') 
-        "
+            (text: string) => verseChange(parseInt(key), text, 'Verse', 'new')
+          "
           :to-verse="trackNew[parseInt(key)]['To']"
           @update:to-verse="
-          (text: string) => verseChange(parseInt(key), text, 'To', 'new') 
-        "
+            (text: string) => verseChange(parseInt(key), text, 'To', 'new')
+          "
           v-model:errors="errVerse"
           :show-version="true"
           :show-to-verse="true"

@@ -13,7 +13,6 @@ import {
 import { generateAccessToken, generateRefreshToken } from "../helper/tokens.js";
 import dotenv from "dotenv";
 import { uploadImage } from "../cloudinary.js";
-import Verses from "../models/VerseModel.js";
 
 dotenv.config();
 
@@ -57,7 +56,7 @@ router.post("/register", upload.single("avatar"), async (req, res) => {
     try {
       [avatarUrl, avatarId] = await uploadImage(
         req.file.buffer,
-        req.file.mimetype
+        req.file.mimetype,
       );
     } catch (error) {
       console.error(error, "Failed");
@@ -212,7 +211,7 @@ router.post("/forgotPassword", async (req, res) => {
       await User.findOneAndUpdate(
         { email: email },
         { password: hashedPassword },
-        { new: true }
+        { new: true },
       );
       delete resetCode[`${email}`];
       return res

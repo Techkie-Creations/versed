@@ -1,5 +1,6 @@
 import Socials from "../models/SocialModel.js";
 import Verses from "../models/VerseModel.js";
+import bcrypt from "bcrypt";
 
 const assign = {
   A: "13",
@@ -84,7 +85,7 @@ export const codeGenerator = (num) => {
 export const checkDate = (changeDate, daysElapsed) => {
   if (!changeDate) return [true, null];
   const daysLeft = Math.floor(
-    Math.abs(new Date() - new Date(changeDate)) / (1000 * 60 * 60 * 24)
+    Math.abs(new Date() - new Date(changeDate)) / (1000 * 60 * 60 * 24),
   );
   const today = new Date().toLocaleDateString();
 
@@ -115,7 +116,7 @@ export const registerUser = async (id, misc = {}) => {
     const socials = new Socials({
       userId: id,
     });
-    await verses.save(), socials.save();
+    (await verses.save(), socials.save());
     return true;
   } catch (error) {
     console.error("Reg User: ", error);

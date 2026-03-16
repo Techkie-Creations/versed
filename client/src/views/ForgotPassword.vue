@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { useField, useForm } from "vee-validate";
 import { onMounted } from "vue";
-import VerseSelector from "@/components/VerseSelector.vue";
+import VerseSelector from "@/components/Misc/VerseSelector.vue";
 import { VueSpinnerBars } from "vue3-spinners";
 import { ref } from "vue";
 import { ForgotPasswordSchema } from "@/utils/ValidationSchemas";
 import { forgotPassword } from "@/api/authApi";
 import { useToast } from "vue-toastification";
-import PasswordReset from "@/components/PasswordReset.vue";
-import NavBar from "@/components/NavBar.vue";
+import PasswordReset from "@/components/Misc/PasswordReset.vue";
+import NavBar from "@/components/Misc/NavBar.vue";
 
 const { handleSubmit, errors, isSubmitting } = useForm({
   validationSchema: ForgotPasswordSchema,

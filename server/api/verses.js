@@ -3,6 +3,7 @@ import { validateToken } from "../middleware/validateToken.js";
 import Verses from "../models/VerseModel.js";
 import { verseId } from "../helper/misc.js";
 import User from "../models/UserModel.js";
+import bcrypt from "bcrypt";
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router
     try {
       const allVerses = await Verses.findOne(
         { userId: req.info.userId },
-        "verseId verses globalVersion mode"
+        "verseId verses globalVersion mode",
       );
       if (!allVerses) {
         return res.status(200).json({ success: true, verses: {} });
@@ -69,7 +70,7 @@ router
           verses: allVerses,
           mode: Object.keys(allVerses).length >= 30 ? "Mature" : "Newbie",
         },
-        { new: true }
+        { new: true },
       );
 
       return res.status(200).json({
@@ -90,7 +91,7 @@ router
       await Verses.findOneAndUpdate(
         { userId: req.info.userId },
         { verses: {} },
-        { new: true }
+        { new: true },
       );
       return res.status(200).json({
         success: true,
@@ -110,7 +111,7 @@ router
     try {
       const verseSec = await Verses.findOne(
         { userId: req.info.userId },
-        "versePass verseVisibility verseAccess"
+        "versePass verseVisibility verseAccess",
       );
       return res.status(200).json({
         success: true,
@@ -130,7 +131,7 @@ router
       await Verses.findOneAndUpdate(
         { userId: req.info.userId },
         { verseAccess: req.body.verseAccess },
-        { new: true }
+        { new: true },
       );
       if (req.body.schema === "addUser")
         return res.status(200).json({
@@ -201,7 +202,7 @@ router.post("/import-verses", validateToken, async (req, res) => {
       const verses = await Verses.findOneAndUpdate(
         { userId: req.info.userId },
         { verses: req.body.verses },
-        { new: true }
+        { new: true },
       );
       return res.status(200).json({
         success: true,
@@ -220,10 +221,11 @@ router.post("/import-verses", validateToken, async (req, res) => {
 router.post("/verses-misc", validateToken, async (req, res) => {
   try {
     if (req.body.schema === "password") {
+      const hashedPass = await bcrypt.hash(req.body.versePass, 10);
       const versePass = await Verses.findOneAndUpdate(
         { userId: req.info.userId },
-        { versePass: req.body.versePass },
-        { new: true }
+        { versePass: hashedPass },
+        { new: true },
       );
       return res.status(200).json({
         success: true,
@@ -232,10 +234,11 @@ router.post("/verses-misc", validateToken, async (req, res) => {
       });
     }
     if (req.body.schema === "visibility") {
+      console.log("HIT VISIBLE");
       const versePass = await Verses.findOneAndUpdate(
         { userId: req.info.userId },
         { verseVisibility: req.body.verseVisibility },
-        { new: true }
+        { new: true },
       );
       return res.status(200).json({
         success: true,
@@ -247,15 +250,13 @@ router.post("/verses-misc", validateToken, async (req, res) => {
       const globalV = await Verses.findOneAndUpdate(
         { userId: req.info.userId },
         { globalVersion: req.body.globalV },
-        { new: true }
+        { new: true },
       );
-      return res
-        .status(200)
-        .json({
-          success: true,
-          message: "Global Version Changed",
-          globalV: globalV.globalVersion,
-        });
+      return res.status(200).json({
+        success: true,
+        message: "Global Version Changed",
+        globalV: globalV.globalVersion,
+      });
     }
   } catch (error) {
     console.error("Verses Misc: ", error);

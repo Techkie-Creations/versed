@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { versesImport } from "@/api/versesApi";
-import { checkVerses, hollowButton, solidButton } from "@/utils/exports";
+import { checkVerses } from "@/exports/VersesExports";
+import { hollowButton, solidButton } from "@/utils/exports";
 import { Dialog } from "primevue";
 import { ref } from "vue";
 

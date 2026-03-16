@@ -7,11 +7,11 @@ import { registerUser } from "@/api/authApi";
 import { VueSpinnerBars } from "vue3-spinners";
 import { useToast } from "vue-toastification";
 import { RegistrationSchema } from "@/utils/ValidationSchemas";
-import VerseSelector from "@/components/VerseSelector.vue";
-import PasswordConfirmation from "@/components/PasswordConfirmation.vue";
+import VerseSelector from "@/components/Misc/VerseSelector.vue";
+import PasswordConfirmation from "@/components/Misc/PasswordConfirmation.vue";
 import router from "@/router";
-import NavBar from "@/components/NavBar.vue";
-import Avatar from "@/components/Avatar.vue";
+import NavBar from "@/components/Misc/NavBar.vue";
+import Avatar from "@/components/Misc/Avatar.vue";
 
 const file = ref(defaultAvatar);
 
@@ -65,7 +65,7 @@ const onSubmit = handleSubmit(async (data, action) => {
 
   formData.append(
     "avatar",
-    data.avatar.length !== 0 ? fileReturn[0] : data.avatar[0]
+    data.avatar.length !== 0 ? fileReturn[0] : data.avatar[0],
   );
   formData.append("firstName", data.firstName);
   formData.append("lastName", data.lastName);
@@ -77,7 +77,7 @@ const onSubmit = handleSubmit(async (data, action) => {
   formData.append("verse", data.verse);
   formData.append(
     "defaultAvatar",
-    file.value !== defaultAvatar ? "false" : "true"
+    file.value !== defaultAvatar ? "false" : "true",
   );
 
   const results = await registerUser(formData);
