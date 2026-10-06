@@ -20,12 +20,16 @@ const props = defineProps({
     type: String,
     default: "Saving...",
   },
+  style: {
+    type: String,
+    default: "",
+  },
 });
 
 const successClick = defineEmits(["successClick"]);
 
 const showModal = defineModel("showModal", { type: Boolean });
-const isLoading = defineModel("isLoading");
+const isLoading = defineModel("isLoading", { type: Boolean });
 </script>
 
 <template>
@@ -48,7 +52,7 @@ const isLoading = defineModel("isLoading");
         <button
           type="button"
           @click="successClick('successClick')"
-          :class="hollowButton"
+          :class="hollowButton + ' ' + style"
         >
           <span class="flex justify-center gap-2 items-center" v-if="!isLoading"
             ><i :class="`pi pi-${props.successIcon}`"></i

@@ -150,6 +150,7 @@ const addVerse = (key: number) => {
       type="button"
       :class="hollowButton + ' w-auto! flex items-center gap-2'"
       @click="showModal = true"
+      v-if="mode === 'Mature'"
     >
       <i class="pi pi-download"></i>
       Import Verses

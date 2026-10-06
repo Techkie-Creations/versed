@@ -94,6 +94,7 @@ const importSelected = async () => {
     }, 3000);
     return;
   }
+  if (allVerses.data["msg"]) return;
   const results = await versesImport({
     schema: "submit",
     verses: { ...verses.value, ...allVerses.data },

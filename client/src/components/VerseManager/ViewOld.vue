@@ -22,35 +22,35 @@ const handleRemove = defineEmits(["handleRemove"]);
         :version="verses[key].Version"
         @update:version="
           (text: string) => {
-            verseChange(i, text, 'Version', 'track');
+            verseChange(i, text, verses[i]['Version'], 'Version', 'track');
             numOfTrack++;
           }
         "
         :book="verses[key].Book"
         @update:book="
           (text: string) => {
-            verseChange(i, text, 'Book', 'track');
+            verseChange(i, text, verses[i]['Book'], 'Book', 'track');
             numOfTrack++;
           }
         "
         :chapter="verses[key].Chapter"
         @update:chapter="
           (text: string) => {
-            verseChange(i, text, 'Chapter', 'track');
+            verseChange(i, text, verses[i]['Chapter'], 'Chapter', 'track');
             numOfTrack++;
           }
         "
         :verse="verses[key].Verse"
         @update:verse="
           (text: string) => {
-            verseChange(i, text, 'Verse', 'track');
+            verseChange(i, text, verses[i]['Verse'], 'Verse', 'track');
             numOfTrack++;
           }
         "
         :to-verse="verses[key].To"
         @update:to-verse="
           (text: string) => {
-            verseChange(i, text, 'To', 'track');
+            verseChange(i, text, verses[i]['To'], 'To', 'track');
             numOfTrack++;
           }
         "
