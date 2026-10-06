@@ -1,0 +1,6 @@
+There a degrees:
+    Newbie: This is the initial degree that everyone starts at
+    Mature: Under certain conditions upgrades to this degree
+    AYSKTT: The highest degree reached which allows a robust customization of Versed in upgrading to school level (indicated below)
+
+School: is an organization system that allows Rabbi-Disciples system which allows users to create an environment for a group of believers to track memorization and reading of scripture, assigning biblical tasks etc (still in planning)

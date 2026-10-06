@@ -1,0 +1,38 @@
+Exam Manager
+- make the mock exam CRUD functionality
+- make a section for all the mock exams created and completed only
+    - delete mock exams that are deleted -- don't keep in db
+- for past exams if the number passes 8 open a new tab to display all
+- for upcoming exams only display 1 and at most 2 if inclusive of mock exam
+- after every 9 days there must be an exam however they cannot be unlocked without user inputting at least 14 verses of their own
+- send a notification that exam is starting soon (1 day, 12 hours, 1 hour, 30 min, 5 min)
+    - if user doesn't join within 10 mins of starting the auto-fail
+- create a page informing users on exam rules
+- set it so that when the exam is completed that the backend sets the start time, end time, and exam date
+Mature mode: include failed, New Testament or Old, 
+
+Verse Manager
+- double check the import verses functionality
+    - make sure the 'nothing to import' message is not recorded into the database
+- fix the verses and chapters in verse selector
+- let them know that just coz you have a long range of verses in one verse selector doesnt increase the number of verses you have for example Proverbs 3:5-6 is regarded as a single verse and not split into 2 verses
+- at some point people can buy verse bundles ranging from 7 to the needed amount to be an AYSKTT
+- remove the To, there shouldn't be range (maybe for now coz it doesn't make sense)
+
+Dashboard
+- build the lessons
+    - create a logic that auto-creates the questions asked
+
+
+LATER:
+Exam Manager
+- note a mock exam cannot be written with 1 hours of an upcoming exam
+        i.e exam will be a 15:00 therefore from 14:00- till the end of the exam no mock exam can be created unless exam is cancelled or reschedule
+        - if mock exam create will extend into the 1 hour then prohibit creation unless its set for a future date or time after the exam 
+
+Create an org level system that has rabbi level and its disciple accounts
+  - it can set exam dates, set regulations for verses etc (plan it out)
+
+Game system - create a verse compete game - registers user id for competition
+
+Completed:

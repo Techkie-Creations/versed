@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./api/auth.js";
 import accountRouter from "./api/useraccount.js";
 import verseRouter from "./api/verses.js";
+import examRouter from "./api/exams.js";
 import { connectDB } from "./config/dbconfig.js";
 import { validateToken } from "./middleware/validateToken.js";
 import User from "./models/UserModel.js";
@@ -31,12 +32,13 @@ app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/user", accountRouter);
 app.use("/api/verses", verseRouter);
+app.use("/api/exam-mgmr", examRouter);
 
 app.get("/api/checkUser", validateToken, async (req, res) => {
   try {
     const userDetails = await User.findById(
       req.info.userId,
-      "firstName lastName avatar"
+      "firstName lastName avatar",
     );
     return res
       .cookie("accessToken", req.info.token, {
