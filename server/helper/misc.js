@@ -123,3 +123,46 @@ export const registerUser = async (id, misc = {}) => {
     return false;
   }
 };
+
+export const examId = (userId, type, examno) => {
+  const id =
+    `exam${examno}-` +
+    userId.substring(0, 7) +
+    `${type === "mock" ? `-mock-` : "-official-"}` +
+    userId.substring(14, 21 - String(examno).length) +
+    examno;
+  return id;
+};
+
+export const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+export const removeKeys = (items, ...keys) => {
+  return items.map((item) => {
+    const copy = item.toObject();
+
+    keys.forEach((key) => {
+      delete copy[key];
+    });
+
+    return copy;
+  });
+};
+
+export const examDate = (type, ...args) => {
+  const newDate = new Date();
+  if (type === "created")
+    return newDate.toLocaleString("en-GB", {
+      timeStyle: "short",
+      dateStyle: "short",
+    });
+  else if (type === "end") {
+    if (args[0]) {
+      newDate.setMinutes(newDate.getMinutes() + args[0]);
+      return newDate.toLocaleString("en-GB", { timeStyle: "short" });
+    }
+    return "";
+  } else if (type === "start") {
+    return newDate.toLocaleString("en-GB", { timeStyle: "short" });
+  }
+  return newDate.toLocaleString("en-GB", { dateStyle: "short" });
+};

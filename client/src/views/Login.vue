@@ -64,7 +64,7 @@ const onSubmit = handleSubmit(async (data) => {
     </div>
     <div class="mb-4 w-full">
       <label for="password" class="block mb-2"
-        ><i class="pi pi-envelope text-baseRed mr-4"></i> Password
+        ><i class="pi pi-lock text-baseRed mr-4"></i> Password
         <span class="text-baseRed">*</span> :</label
       >
       <InputGroup>

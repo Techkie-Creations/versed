@@ -50,19 +50,24 @@ router
           .status(200)
           .json({ success: true, message: "Verses Saved!" });
       }
-      const { verses, newVerses, track } = req.body;
-      const trackKeys = Object.keys(track);
+      const { verses, newVerses } = req.body;
+      // const trackKeys = Object.keys(track);
 
-      for (let i = 0; i < trackKeys.length; i++) {
-        const trackId = track[trackKeys[i]];
-        verseId["Version"] = trackId["Version"];
-        verseId["Book"] = trackId["Book"];
-        verseId["Chapter"] = trackId["Chapter"];
-        verseId["Verse"] = trackId["Verse"];
-        verseId["To"] = trackId["To"];
-      }
+      // for (let i = 0; i < trackKeys.length; i++) {
+      //   const trackId = track[trackKeys[i]];
+      //   verseId["Version"] = trackId["Version"];
+      //   verseId["Book"] = trackId["Book"];
+      //   verseId["Chapter"] = trackId["Chapter"];
+      //   verseId["Verse"] = trackId["Verse"];
+      //   verseId["To"] = trackId["To"];
+      // }
 
-      const allVerses = { ...verses, ...newVerses };
+      console.log(verses);
+
+      const allVerses =
+        Object.keys(newVerses).length === 0
+          ? { ...verses }
+          : { ...verses, ...newVerses };
 
       const updatedVerses = await Verses.findOneAndUpdate(
         { userId: req.info.userId },

@@ -110,7 +110,6 @@ const arrangeVerses = (schema: "track" | "new" | "sort", id: number) => {
 onMounted(async () => {
   const results = await getVerses();
   if (results.success) {
-    console.log(results, "VERSES");
     mode.value = results.mode || "Newbie";
     globalV.value = results.globalV;
     verseId.value = results.verseId;
@@ -189,10 +188,26 @@ const handleSave = async () => {
   arrangeVerses("new", numOfVerses.value);
   let allVerses = checkVerses(verses.value, trackNew.value);
   allVerses = checkVerses(removedVerses.value, trackNew.value);
+
+  const tracked = JSON.parse(localStorage.getItem("track") ?? "{}");
+  const trackKeys = Object.keys(tracked);
+
+  if (!allVerses.status && trackKeys.length === 0) {
+    showModal.value = false;
+    return;
+  }
+
+  for (let i = 0; i < trackKeys.length; i++) {
+    const part = Object.keys(tracked[trackKeys[i]]).filter(
+      (item) => !item.includes("Old"),
+    )[0];
+    verses.value[trackKeys[i]][part] = tracked[trackKeys[i]][part];
+  }
+
   const formdata = {
     newVerses: allVerses.data,
     verses: verses.value,
-    track: JSON.parse(localStorage.getItem("track") || "{}"),
+    // track: JSON.parse(localStorage.getItem("track") || "{}"),
   };
 
   const results = await saveVerses(formdata);
@@ -201,7 +216,17 @@ const handleSave = async () => {
     numOfVerses.value = numOfVerses.value + numOfNewVerses.value;
     numOfRemoved.value = 0;
     numOfNewVerses.value = 0;
-    localStorage.setItem("trackNew", "{}");
+    trackNew.value = {};
+    removedVerses.value = {};
+    track.value = {};
+
+    numOfNewVerses.value = 0;
+    numOfRemoved.value = 0;
+    numOfTrack.value = 0;
+
+    localStorage.setItem("track", JSON.stringify(track.value));
+    localStorage.setItem("trackNew", JSON.stringify(trackNew.value));
+    localStorage.setItem("removed", JSON.stringify(removedVerses.value));
     toast.success(results.message);
     showModal.value = false;
     return;
@@ -319,6 +344,16 @@ const handleCancel = () => {
       verses.value = arrangeVerses("track", parseInt(removedId["Id"]));
     }
   }
+
+  const tracked = JSON.parse(localStorage.getItem("track") ?? "{}");
+  const trackKeys = Object.keys(tracked);
+  for (let i = 0; i < trackKeys.length; i++) {
+    const part = Object.keys(tracked[trackKeys[i]]).filter((item) =>
+      item.includes("Old"),
+    )[0];
+    verses.value[trackKeys[i]][part.substring(3)] = tracked[trackKeys[i]][part];
+  }
+
   trackNew.value = {};
   removedVerses.value = {};
   track.value = {};
@@ -513,7 +548,10 @@ const removeVerseUser = async (userMail: string) => {
         </div>
         <button
           type="button"
-          :class="solidButton + ' bg-baseRed! flex gap-2 items-center w-auto!'"
+          :class="
+            solidButton +
+            ' bg-baseRed! flex gap-2 items-center w-auto! text-alice! border-baseRed! hover:border-alice!'
+          "
           @click="showRemoveModal = true"
           v-if="numOfVerses > 0"
         >
@@ -524,6 +562,8 @@ const removeVerseUser = async (userMail: string) => {
           v-bind:is-loading="isLoading"
           success-icon="trash"
           success-text="Remove All"
+          header="Remove All Verses"
+          :style="`hover:bg-baseRed hover:text-alice! hover:border-eerie`"
           dialog-text="Are you sure you want to delete all your verses?"
           @success-click="handleDelete"
         />
@@ -546,14 +586,14 @@ const removeVerseUser = async (userMail: string) => {
           v-model:err-verse="errVerse"
           v-model:track-new="trackNew"
           v-model:error="error"
-          @handle-remove="(e) => handleRemoval(e, 'new')"
+          @handle-remove="(e: number) => handleRemoval(e, 'new')"
         />
         <ViewOld
           v-model:num-of-verses="numOfVerses"
           v-model:num-of-track="numOfTrack"
           v-model:err-verse="errVerse"
           v-model:verses="verses"
-          @handle-remove="(e) => handleRemoval(e, 'track')"
+          @handle-remove="(e: number) => handleRemoval(e, 'track')"
         />
       </div>
       <ConfirmPopup

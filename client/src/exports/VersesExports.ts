@@ -2,14 +2,17 @@
 export const verseChange = (
   index: number,
   text: string | number,
+  oldText: string | number,
   part: string,
   schema: "track" | "new",
 ) => {
   const track = JSON.parse(localStorage.getItem("track") || "{}");
   const trackNew = JSON.parse(localStorage.getItem("trackNew") || "{}");
+  console.log(oldText, text);
   if (schema === "track") {
     if (Object.keys(track).length === 0 || !track[index]) track[index] = {};
     track[index][part] = text;
+    track[index][`Old${part}`] = oldText;
     localStorage.setItem("track", JSON.stringify(track));
   }
 

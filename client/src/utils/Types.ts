@@ -17,6 +17,21 @@ export type verseType = {
   version: string;
 };
 
+export type ExamType = {
+  examDate: string;
+  startTime: string;
+  endTime: string;
+  type: "mock" | "official";
+  duration: number;
+  created: string;
+  timezone: string;
+  includeFailed: Boolean;
+  numofverses: Number;
+  status: string;
+  title: string;
+  examid: string;
+};
+
 // BIBLICAL ZONE
 export const bibleVersions = [
   "NKJV",

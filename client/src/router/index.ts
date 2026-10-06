@@ -7,6 +7,7 @@ import { Authenticated } from "@/utils/Authentication";
 import UserAccount from "@/views/UserAccount.vue";
 import VerseManager from "@/views/VerseManager.vue";
 import NotFound from "@/views/NotFound.vue";
+import ExamManager from "@/views/ExamManager.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -55,6 +56,14 @@ const router = createRouter({
       path: "/my-verses",
       name: "verses",
       component: VerseManager,
+      meta: {
+        name: "after",
+      },
+    },
+    {
+      path: "/exam-mgmr",
+      name: "exam",
+      component: ExamManager,
       meta: {
         name: "after",
       },
